@@ -13,7 +13,7 @@ public sealed class GraphLinkingService
     /// <param name="graph">The graph to link.</param>
     /// <param name="cancellationToken">The cancellation token for the operation.</param>
     /// <returns>A task that returns the linked graph.</returns>
-    public Task<MetadataGraphModel> LinkAsync(MetadataGraphModel graph, CancellationToken cancellationToken)
+    public static Task<MetadataGraphModel> LinkAsync(MetadataGraphModel graph, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(graph);
