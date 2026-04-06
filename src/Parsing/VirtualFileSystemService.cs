@@ -9,6 +9,9 @@ namespace XsdXmlParser.Core.Parsing;
 /// </summary>
 public sealed class VirtualFileSystemService : IVirtualFileSystem
 {
+    /// <summary>
+    /// The in-memory buffers keyed by logical path for memory-backed and stream-backed sources.
+    /// </summary>
     private readonly ConcurrentDictionary<string, byte[]> buffers = new(StringComparer.Ordinal);
 
     /// <inheritdoc/>
@@ -104,6 +107,11 @@ public sealed class VirtualFileSystemService : IVirtualFileSystem
         return Path.GetFullPath(Path.Combine(baseDirectory, relativePath));
     }
 
+    /// <summary>
+    /// Throws when a required path argument is null, empty, or whitespace.
+    /// </summary>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">The parameter name used in any thrown exception.</param>
     private static void ThrowIfNullOrWhiteSpace(string value, string paramName)
     {
         if (string.IsNullOrWhiteSpace(value))

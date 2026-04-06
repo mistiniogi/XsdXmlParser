@@ -9,8 +9,19 @@ namespace XsdXmlParser.Core.Registry;
 /// </summary>
 public sealed class SchemaRegistryService
 {
+    /// <summary>
+    /// The lifecycle entries keyed by canonical reference identifier.
+    /// </summary>
     private readonly Dictionary<string, SchemaRegistryEntryModel> entries = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// The canonical reference identifiers keyed by logical entry identity.
+    /// </summary>
     private readonly Dictionary<string, string> canonicalRefIds = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// The deterministic reference identifier factory used for named and anonymous entries.
+    /// </summary>
     private readonly RefIdFactory refIdFactory;
 
     /// <summary>
@@ -36,6 +47,7 @@ public sealed class SchemaRegistryService
     /// <summary>
     /// Gets the canonical type registry used for exported graph content.
     /// </summary>
+    /// <value>The canonical type registry used to surface exported graph content.</value>
     public TypeRegistry TypeRegistry { get; }
 
     /// <summary>
@@ -184,6 +196,13 @@ public sealed class SchemaRegistryService
         TypeRegistry.Store(model);
     }
 
+    /// <summary>
+    /// Creates lifecycle metadata for a discovered canonical entry.
+    /// </summary>
+    /// <param name="refId">The canonical reference identifier.</param>
+    /// <param name="entryKind">The logical entry kind.</param>
+    /// <param name="sourceId">The owning source identifier.</param>
+    /// <returns>The registry lifecycle entry.</returns>
     private static SchemaRegistryEntryModel CreateEntry(string refId, string entryKind, string sourceId)
     {
         return new SchemaRegistryEntryModel
@@ -195,6 +214,11 @@ public sealed class SchemaRegistryService
         };
     }
 
+    /// <summary>
+    /// Throws when a required value is null, empty, or whitespace.
+    /// </summary>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">The parameter name used in any thrown exception.</param>
     private static void ThrowIfNullOrWhiteSpace(string value, string paramName)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -203,6 +227,14 @@ public sealed class SchemaRegistryService
         }
     }
 
+    /// <summary>
+    /// Creates or retrieves a canonical reference identifier for a named schema entry.
+    /// </summary>
+    /// <param name="kind">The logical entry kind.</param>
+    /// <param name="sourceId">The owning source identifier.</param>
+    /// <param name="qualifiedName">The qualified schema name.</param>
+    /// <param name="schemaPath">The canonical schema path used for conflict tracking.</param>
+    /// <returns>The canonical reference identifier.</returns>
     private string GetOrCreateNamedRefId(string kind, string sourceId, string qualifiedName, string schemaPath)
     {
         ThrowIfNullOrWhiteSpace(sourceId, nameof(sourceId));

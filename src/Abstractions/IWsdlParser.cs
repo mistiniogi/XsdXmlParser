@@ -15,6 +15,12 @@ public interface IWsdlParser
     /// <param name="filePath">The WSDL file path.</param>
     /// <param name="cancellationToken">The cancellation token for the operation.</param>
     /// <returns>A task that returns the parsed metadata graph.</returns>
+    /// <example>
+    /// <code language="csharp"><![CDATA[
+    /// MetadataGraphModel graph = await wsdlParser.ParseFromFileAsync("contracts/service.wsdl", cancellationToken)
+    ///     .ConfigureAwait(false);
+    /// ]]></code>
+    /// </example>
     Task<MetadataGraphModel> ParseFromFileAsync(string filePath, CancellationToken cancellationToken);
 
     /// <summary>
@@ -24,5 +30,8 @@ public interface IWsdlParser
     /// <param name="logicalPath">The logical path used for relative resolution.</param>
     /// <param name="cancellationToken">The cancellation token for the operation.</param>
     /// <returns>A task that returns the parsed metadata graph.</returns>
+    /// <remarks>
+    /// Use the logical path to anchor imported resources when the WSDL is supplied from memory rather than a physical file.
+    /// </remarks>
     Task<MetadataGraphModel> ParseFromStringAsync(string content, string logicalPath, CancellationToken cancellationToken);
 }

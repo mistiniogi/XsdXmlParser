@@ -10,11 +10,17 @@ namespace XsdXmlParser.Core.Serialization;
 /// </summary>
 public sealed class MetadataGraphJsonSerializer : IMetadataGraphSerializer
 {
+    /// <summary>
+    /// The serializer options used for normalized metadata graph output.
+    /// </summary>
     private readonly JsonSerializerOptions serializerOptions;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MetadataGraphJsonSerializer"/> class.
     /// </summary>
+    /// <remarks>
+    /// The default configuration emits indented web-style JSON and registers graph-specific converters required by the normalized metadata model.
+    /// </remarks>
     public MetadataGraphJsonSerializer()
     {
         serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);

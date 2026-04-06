@@ -8,11 +8,13 @@ public abstract class ParseRequestModel
     /// <summary>
     /// Gets or sets the caller-declared document kind for the primary request-model workflow.
     /// </summary>
+    /// <value>The document kind that instructs the orchestration layer whether the primary content is XSD or WSDL.</value>
     public ESchemaDocumentKind DocumentKind { get; set; }
 
     /// <summary>
     /// Gets or sets the optional display name used in diagnostics.
     /// </summary>
+    /// <value>The display name shown in diagnostics when a more user-friendly label than the path is available.</value>
     public string? DisplayName { get; set; }
 
     /// <summary>

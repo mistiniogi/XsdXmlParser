@@ -1,18 +1,15 @@
 <!--
 Sync Impact Report
-Version change: 1.1.0 -> 1.2.0
+Version change: 1.2.0 -> 1.3.0
 Modified principles:
-- V. Documented DI-First Public Surface -> V. Fully Documented C# Surface
+- V. Fully Documented C# Surface
 Added sections:
 None
 Removed sections:
 None
 Templates requiring updates:
-- ✅ .specify/templates/plan-template.md
-- ✅ .specify/templates/spec-template.md
-- ✅ .specify/templates/tasks-template.md
+- None
 - ⚠ pending .specify/templates/commands/*.md (directory absent in this repository)
-- ✅ README.md
 - ✅ .github/copilot-instructions.md
 Follow-up TODOs:
 - TODO(RATIFICATION_DATE): original ratification date is not recorded in repository history.
@@ -35,22 +32,24 @@ Enums MUST use the `E` prefix, models MUST use the `Model` suffix, and interface
 The repository MUST be governed as a multi-targeted NuGet library targeting `net6.0`, `net7.0`, and `net8.0`; console-app-only assumptions, tooling, or release rules MUST NOT define the default engineering workflow. Shared production code MUST remain compatible with C# 10.0 only, and features that require newer language versions, including `required` members, primary constructors, list patterns, collection expressions, and file-local types, MUST NOT appear in shared production code. Rationale: NuGet consumers need a stable compatibility matrix, and governance must optimize for reusable package delivery rather than executable-host assumptions.
 
 ### V. Fully Documented C# Surface
-Core services MUST be reachable through dependency-injection-friendly abstractions and registration extensions suitable for host applications and tests. Every C# class, struct, enum, interface, property, method, constructor, delegate, event, and other library-facing declaration in shared production code MUST include XML documentation tags, using `<summary>` and adding `<param>`, `<returns>`, `<value>`, `<remarks>`, or related tags wherever applicable. Public async methods MUST use the `Async` suffix. Lifetimes, registry ownership, and parser composition MUST be explicit, mockable, and reviewable, with static access patterns avoided unless they are internal implementation details behind DI-managed services. Rationale: production-grade library integration depends on composability, testability, complete IntelliSense discoverability, and maintainable generated package documentation.
+Core services MUST be reachable through dependency-injection-friendly abstractions and registration extensions suitable for host applications and tests. Every C# class, struct, enum, interface, property, method, constructor, delegate, event, field, and other declaration in shared production code MUST include XML documentation comments across all declaration visibility levels, using `<summary>` universally and adding `<param>`, `<typeparam>`, `<returns>`, `<value>`, `<remarks>`, `<exception>`, `<example>`, `<paramref>`, `<typeparamref>`, `<see>`, or `<seealso>` wherever applicable. Existing accurate XML documentation intent MUST be preserved and enhanced rather than replaced indiscriminately, examples MUST be added selectively when they materially improve understanding, and inline reference tags SHOULD be preferred over plain text when they improve precision or generated reference quality. Public async methods MUST use the `Async` suffix. Lifetimes, registry ownership, and parser composition MUST be explicit, mockable, and reviewable, with static access patterns avoided unless they are internal implementation details behind DI-managed services. Rationale: production-grade library integration depends on composability, testability, complete IntelliSense discoverability, consistent source-level maintainability, and generated package documentation that remains useful for both consumer-facing and lower-visibility declarations.
 
 ## Engineering Standards
 
 - Published package identity and documentation MUST refer to the library as `XsdXmlParser.Core`.
 - The codebase MUST retain Clean Architecture boundaries between models, parsing, validation, registry management, and output generation.
 - Graph traversal remains the required mechanism for recursion, cross-reference resolution, and cycle-safe navigation.
-- All C# types and members in shared production code MUST carry XML documentation comments that accurately describe intent, inputs, outputs, and usage constraints.
+- All C# declarations in shared production code, regardless of visibility, MUST carry XML documentation comments that accurately describe intent, inputs, outputs, values, references, and usage constraints using the applicable XML tag set.
+- XML documentation updates MUST remain documentation-only unless a separate approved feature explicitly authorizes runtime, structural, signature, or behavioral code changes.
+- Accurate existing XML documentation MUST be preserved and expanded in place, while placeholder, redundant, or low-information comment text MUST be replaced with meaningful explanation.
 - Complex logic, including XSD traversal, schema-linking heuristics, cycle handling, and canonicalization rules, MUST include inline `Why` comments where the intent would not otherwise be obvious from the code alone.
 - Compatibility validation MUST run against `net6.0`, `net7.0`, and `net8.0` for every release candidate.
 
 ## Delivery Workflow
 
-- Every feature plan MUST include a constitution check covering async I/O, registry canonicalization, naming contracts, target framework support, DI boundaries, full C# XML documentation expectations, and rationale-comment hotspots for complex logic.
-- Every task plan MUST include foundational work for async service contracts, centralized registry implementation, DI registration, XML documentation coverage for C# types and members, rationale comments for complex traversal code, and multi-target validation.
-- Reviews MUST reject duplicated type-definition storage, undocumented naming exceptions, missing XML documentation on C# types or members, missing required `Why` comments in complex logic, and any use of C# features newer than 10.0 in shared code.
+- Every feature plan MUST include a constitution check covering async I/O, registry canonicalization, naming contracts, target framework support, DI boundaries, all-visibility C# XML documentation expectations, selective example policy, inline reference-tag usage, documentation-only scope constraints when applicable, and rationale-comment hotspots for complex logic.
+- Every task plan MUST include foundational work for async service contracts, centralized registry implementation, DI registration, XML documentation coverage for C# declarations across all relevant visibility levels, preservation of existing accurate comment intent, and multi-target validation.
+- Reviews MUST reject duplicated type-definition storage, undocumented naming exceptions, missing XML documentation on any in-scope shared-production declaration, missing required applicable XML tags, speculative or misleading XML documentation text, missing required `Why` comments in complex logic, and any use of C# features newer than 10.0 in shared code.
 - Performance and cancellation validation MUST occur before feature work is considered implementation-complete for parsing pipelines.
 - Release notes and package metadata MUST describe the supported target framework matrix and async-first API expectations.
 
@@ -62,4 +61,4 @@ Core services MUST be reachable through dependency-injection-friendly abstractio
 - Compliance reviews are required at spec, plan, task-generation, and pull-request time. Reviewers MUST block changes that violate the constitution without an approved amendment.
 - Ratification history before this document is incomplete; `TODO(RATIFICATION_DATE): original adoption date not recorded in repository history.`
 
-**Version**: 1.2.0 | **Ratified**: TODO(RATIFICATION_DATE): original adoption date not recorded in repository history. | **Last Amended**: 2026-04-05
+**Version**: 1.3.0 | **Ratified**: TODO(RATIFICATION_DATE): original adoption date not recorded in repository history. | **Last Amended**: 2026-04-06

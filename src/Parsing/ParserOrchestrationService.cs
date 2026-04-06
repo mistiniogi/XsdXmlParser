@@ -10,8 +10,19 @@ namespace XsdXmlParser.Core.Parsing;
 /// </summary>
 public sealed class ParserOrchestrationService : IParserOrchestrationService
 {
+    /// <summary>
+    /// The graph builder that assembles normalized metadata output.
+    /// </summary>
     private readonly IMetadataGraphBuilder metadataGraphBuilder;
+
+    /// <summary>
+    /// The source loader that normalizes request inputs before orchestration begins.
+    /// </summary>
     private readonly ISourceLoader sourceLoader;
+
+    /// <summary>
+    /// The WSDL discovery service that expands referenced WSDL and XSD sources when needed.
+    /// </summary>
     private readonly WsdlDiscoveryService wsdlDiscoveryService;
 
     /// <summary>
@@ -41,6 +52,12 @@ public sealed class ParserOrchestrationService : IParserOrchestrationService
         return ExecuteAsync(async () => new[] { await sourceLoader.LoadAsync(request, cancellationToken).ConfigureAwait(false) }, cancellationToken);
     }
 
+    /// <summary>
+    /// Creates a structured orchestration failure for unexpected exceptions.
+    /// </summary>
+    /// <param name="exception">The exception to wrap.</param>
+    /// <param name="stage">The orchestration stage where the failure occurred.</param>
+    /// <returns>The structured parse failure exception.</returns>
     private static ParseFailureException CreateUnexpectedFailure(Exception exception, string stage)
     {
         var diagnostics = new[]
@@ -58,6 +75,12 @@ public sealed class ParserOrchestrationService : IParserOrchestrationService
         return new ParseFailureException(exception.Message, stage, diagnostics, null, exception);
     }
 
+    /// <summary>
+    /// Executes the shared orchestration workflow after request-specific source loading has been selected.
+    /// </summary>
+    /// <param name="loadDescriptorsAsync">The callback that loads the initial normalized descriptors.</param>
+    /// <param name="cancellationToken">The cancellation token for the operation.</param>
+    /// <returns>A task that returns the normalized metadata graph.</returns>
     private async Task<MetadataGraphModel> ExecuteAsync(Func<Task<IReadOnlyList<SourceDescriptorModel>>> loadDescriptorsAsync, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

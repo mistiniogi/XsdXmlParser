@@ -130,6 +130,11 @@ internal static class SchemaParsingHelper
         return string.Concat("rel:", SanitizeIdentifier(fromRefId), ":", SanitizeIdentifier(kind), ":", SanitizeIdentifier(toRefId));
     }
 
+    /// <summary>
+    /// Enumerates contained member items through recursive compositor traversal.
+    /// </summary>
+    /// <param name="container">The container whose descendants should be inspected.</param>
+    /// <returns>The contained member items.</returns>
     private static IEnumerable<XElement> EnumerateContainedMembersIterator(XElement container)
     {
         foreach (var child in container.Elements())
@@ -151,12 +156,22 @@ internal static class SchemaParsingHelper
         }
     }
 
+    /// <summary>
+    /// Calculates the one-based ordinal of an item among siblings with the same name.
+    /// </summary>
+    /// <param name="item">The item whose ordinal should be calculated.</param>
+    /// <returns>The one-based ordinal of the item.</returns>
     private static int GetOneBasedOrdinal(XElement item)
     {
         var siblings = item.Parent?.Elements(item.Name) ?? Enumerable.Repeat(item, 1);
         return siblings.TakeWhile(candidate => !ReferenceEquals(candidate, item)).Count() + 1;
     }
 
+    /// <summary>
+    /// Determines whether traversal should recurse into the supplied container name.
+    /// </summary>
+    /// <param name="localName">The local XML element name.</param>
+    /// <returns><see langword="true"/> when traversal should recurse into the container.</returns>
     private static bool ShouldRecurseIntoContainer(string localName)
     {
         return string.Equals(localName, "all", StringComparison.Ordinal)

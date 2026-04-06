@@ -7,7 +7,7 @@ using XsdXmlParser.Core.Abstractions;
 namespace XsdXmlParser.Core.Parsing;
 
 /// <summary>
-/// Handles WSDL service-level artifacts that do not map to dedicated registry entry models.
+/// Handles WSDL service-level artifacts that do not map to dedicated registry entry models and records serializer hints for them.
 /// </summary>
 internal sealed class WsdlServiceParsedItemHandler : IParsedItemHandler
 {

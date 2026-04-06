@@ -13,11 +13,34 @@ namespace XsdXmlParser.Core.Parsing;
 /// </summary>
 public sealed class XsdGraphBuilder : IMetadataGraphBuilder
 {
+    /// <summary>
+    /// The optional parsed-item handlers used for category-specific XML item processing.
+    /// </summary>
     private readonly IEnumerable<IParsedItemHandler>? parsedItemHandlers;
+
+    /// <summary>
+    /// The canonical schema registry service used to store normalized graph entries.
+    /// </summary>
     private readonly SchemaRegistryService schemaRegistryService;
+
+    /// <summary>
+    /// The optional source graph registry used for cycle-safe traversal.
+    /// </summary>
     private readonly SourceGraphRegistry? sourceGraphRegistry;
+
+    /// <summary>
+    /// The optional source identity provider used for discovered sources.
+    /// </summary>
     private readonly ISourceIdentityProvider? sourceIdentityProvider;
+
+    /// <summary>
+    /// The optional import resolution service used for referenced-source discovery.
+    /// </summary>
     private readonly ImportResolutionService? importResolutionService;
+
+    /// <summary>
+    /// The optional virtual file system used to open and resolve source content.
+    /// </summary>
     private readonly IVirtualFileSystem? virtualFileSystem;
 
     /// <summary>
@@ -48,12 +71,28 @@ public sealed class XsdGraphBuilder : IMetadataGraphBuilder
         this.parsedItemHandlers = parsedItemHandlers ?? throw new ArgumentNullException(nameof(parsedItemHandlers));
     }
 
+    /// <summary>
+    /// Gets the import resolution service used for referenced-source discovery.
+    /// </summary>
+    /// <value>The import resolution service used for referenced-source discovery.</value>
     private ImportResolutionService ImportResolutionService => importResolutionService ?? new ImportResolutionService(VirtualFileSystem);
 
+    /// <summary>
+    /// Gets the source graph registry used for cycle-safe traversal.
+    /// </summary>
+    /// <value>The source graph registry used for cycle-safe traversal.</value>
     private SourceGraphRegistry SourceGraphRegistry => sourceGraphRegistry ?? new SourceGraphRegistry();
 
+    /// <summary>
+    /// Gets the source identity provider used for discovered sources.
+    /// </summary>
+    /// <value>The source identity provider used for discovered sources.</value>
     private ISourceIdentityProvider SourceIdentityProvider => sourceIdentityProvider ?? new SourceIdentityProviderService();
 
+    /// <summary>
+    /// Gets the virtual file system used to open and resolve source content.
+    /// </summary>
+    /// <value>The virtual file system used to open and resolve source content.</value>
     private IVirtualFileSystem VirtualFileSystem => virtualFileSystem ?? new VirtualFileSystemService();
 
     /// <inheritdoc/>
@@ -92,6 +131,13 @@ public sealed class XsdGraphBuilder : IMetadataGraphBuilder
         return await GraphLinkingService.LinkAsync(graph, cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Creates a structured graph-building failure for source-processing errors.
+    /// </summary>
+    /// <param name="source">The source being processed.</param>
+    /// <param name="message">The failure message.</param>
+    /// <param name="innerException">The optional inner exception.</param>
+    /// <returns>The structured parse failure exception.</returns>
     private static ParseFailureException CreateGraphFailure(SourceDescriptorModel source, string message, Exception? innerException = null)
     {
         var diagnostics = new[]
@@ -111,6 +157,13 @@ public sealed class XsdGraphBuilder : IMetadataGraphBuilder
         return new ParseFailureException(message, "graph-building", diagnostics, source.SourceId, innerException);
     }
 
+    /// <summary>
+    /// Creates a normalized descriptor for a newly discovered referenced source.
+    /// </summary>
+    /// <param name="sourceIdentityProvider">The source identity provider used to assign the source identifier.</param>
+    /// <param name="resolvedPath">The resolved source path.</param>
+    /// <param name="documentKind">The document kind associated with the referenced source.</param>
+    /// <returns>The discovered source descriptor.</returns>
     private static SourceDescriptorModel CreateDiscoveredDescriptor(ISourceIdentityProvider sourceIdentityProvider, string resolvedPath, ESchemaDocumentKind documentKind)
     {
         var descriptor = new SourceDescriptorModel
@@ -128,6 +181,10 @@ public sealed class XsdGraphBuilder : IMetadataGraphBuilder
         return descriptor;
     }
 
+    /// <summary>
+    /// Creates the parsed-item dispatcher used for category-specific XML item processing.
+    /// </summary>
+    /// <returns>The parsed-item dispatcher.</returns>
     private ParsedItemHandlerDispatcher CreateDispatcher()
     {
         return parsedItemHandlers is null
@@ -135,6 +192,14 @@ public sealed class XsdGraphBuilder : IMetadataGraphBuilder
             : new ParsedItemHandlerDispatcher(parsedItemHandlers);
     }
 
+    /// <summary>
+    /// Creates the shared parsing context for one source-processing flow.
+    /// </summary>
+    /// <param name="dispatcher">The parsed-item dispatcher for nested item processing.</param>
+    /// <param name="graph">The graph being populated.</param>
+    /// <param name="source">The current source descriptor.</param>
+    /// <param name="targetNamespace">The active target namespace.</param>
+    /// <returns>The shared parsing context.</returns>
     private ParsedItemContext CreateContext(ParsedItemHandlerDispatcher dispatcher, MetadataGraphModel graph, SourceDescriptorModel source, string targetNamespace)
     {
         var context = new ParsedItemContext(graph, schemaRegistryService, source, targetNamespace);
@@ -142,6 +207,10 @@ public sealed class XsdGraphBuilder : IMetadataGraphBuilder
         return context;
     }
 
+    /// <summary>
+    /// Copies registry-backed canonical content into the exported graph model.
+    /// </summary>
+    /// <param name="graph">The graph that receives the exported registry content.</param>
     private void CopyRegistryContent(MetadataGraphModel graph)
     {
         foreach (var pair in schemaRegistryService.TypeRegistry.ComplexTypes)
@@ -175,6 +244,15 @@ public sealed class XsdGraphBuilder : IMetadataGraphBuilder
         }
     }
 
+    /// <summary>
+    /// Processes one XSD schema root and stores the resulting graph content.
+    /// </summary>
+    /// <param name="schemaRoot">The schema root element.</param>
+    /// <param name="source">The current source descriptor.</param>
+    /// <param name="graph">The graph being populated.</param>
+    /// <param name="knownSources">The known sources keyed by virtual path.</param>
+    /// <param name="cancellationToken">The cancellation token for the operation.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     private async Task ProcessSchemaRootAsync(XElement schemaRoot, SourceDescriptorModel source, MetadataGraphModel graph, IDictionary<string, SourceDescriptorModel> knownSources, CancellationToken cancellationToken)
     {
         var dispatcher = CreateDispatcher();
@@ -216,6 +294,14 @@ public sealed class XsdGraphBuilder : IMetadataGraphBuilder
         }
     }
 
+    /// <summary>
+    /// Processes one source descriptor and adds its canonical content to the graph.
+    /// </summary>
+    /// <param name="source">The source descriptor to process.</param>
+    /// <param name="graph">The graph being populated.</param>
+    /// <param name="knownSources">The known sources keyed by virtual path.</param>
+    /// <param name="cancellationToken">The cancellation token for the operation.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     private async Task ProcessSourceAsync(SourceDescriptorModel source, MetadataGraphModel graph, IDictionary<string, SourceDescriptorModel> knownSources, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -262,6 +348,15 @@ public sealed class XsdGraphBuilder : IMetadataGraphBuilder
         }
     }
 
+    /// <summary>
+    /// Processes one WSDL root and collects service artifacts plus embedded schema content.
+    /// </summary>
+    /// <param name="wsdlRoot">The WSDL root element.</param>
+    /// <param name="source">The current source descriptor.</param>
+    /// <param name="graph">The graph being populated.</param>
+    /// <param name="knownSources">The known sources keyed by virtual path.</param>
+    /// <param name="cancellationToken">The cancellation token for the operation.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     private async Task ProcessWsdlRootAsync(XElement wsdlRoot, SourceDescriptorModel source, MetadataGraphModel graph, IDictionary<string, SourceDescriptorModel> knownSources, CancellationToken cancellationToken)
     {
         // Why: WSDL documents are the orchestration root for SOAP schemas, so we collect service
@@ -302,6 +397,16 @@ public sealed class XsdGraphBuilder : IMetadataGraphBuilder
         }
     }
 
+    /// <summary>
+    /// Resolves, registers, and processes one referenced source.
+    /// </summary>
+    /// <param name="source">The source that declared the reference.</param>
+    /// <param name="relativePath">The referenced relative path.</param>
+    /// <param name="documentKind">The document kind expected for the referenced source.</param>
+    /// <param name="graph">The graph being populated.</param>
+    /// <param name="knownSources">The known sources keyed by virtual path.</param>
+    /// <param name="cancellationToken">The cancellation token for the operation.</param>
+    /// <returns>A task that returns the resolved source descriptor.</returns>
     private async Task<SourceDescriptorModel> ResolveReferencedSourceAsync(SourceDescriptorModel source, string relativePath, ESchemaDocumentKind documentKind, MetadataGraphModel graph, IDictionary<string, SourceDescriptorModel> knownSources, CancellationToken cancellationToken)
     {
         var resolvedPath = ImportResolutionService.Resolve(source.VirtualPath, relativePath);

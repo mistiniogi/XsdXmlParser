@@ -8,7 +8,7 @@ using XsdXmlParser.Core.Models;
 namespace XsdXmlParser.Core.Parsing;
 
 /// <summary>
-/// Handles simple type schema items.
+/// Handles XSD simple type items and projects them into canonical type and constraint metadata.
 /// </summary>
 internal sealed class SimpleTypeParsedItemHandler : IParsedItemHandler
 {

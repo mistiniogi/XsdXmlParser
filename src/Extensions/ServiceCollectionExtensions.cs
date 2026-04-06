@@ -8,15 +8,24 @@ using XsdXmlParser.Core.Serialization;
 namespace XsdXmlParser.Core.Extensions;
 
 /// <summary>
-/// Registers parser, registry, and serialization services for the library.
+/// Registers the parser, registry, and serialization services that make up the default library pipeline.
 /// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds the default XSD/WSDL parser services to the service collection for the retained file and string workflows.
+    /// Adds the default XSD and WSDL parser services to the service collection.
     /// </summary>
     /// <param name="services">The service collection to update.</param>
     /// <returns>The updated service collection.</returns>
+    /// <remarks>
+    /// The default registration composes singleton registry infrastructure with scoped parsing services so one request can build a normalized metadata graph without leaking state across scopes.
+    /// </remarks>
+    /// <example>
+    /// <code language="csharp"><![CDATA[
+    /// IServiceCollection services = new ServiceCollection();
+    /// services.AddXsdXmlParser();
+    /// ]]></code>
+    /// </example>
     public static IServiceCollection AddXsdXmlParser(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);

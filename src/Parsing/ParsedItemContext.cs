@@ -11,6 +11,9 @@ namespace XsdXmlParser.Core.Parsing;
 /// </summary>
 internal sealed class ParsedItemContext
 {
+    /// <summary>
+    /// The nested item dispatcher used when handlers must recursively process child items.
+    /// </summary>
     private Func<XElement, string?, int, CancellationToken, Task<string?>>? nestedItemHandler;
 
     /// <summary>
@@ -31,27 +34,34 @@ internal sealed class ParsedItemContext
     /// <summary>
     /// Gets the graph being populated.
     /// </summary>
+    /// <value>The normalized metadata graph that receives parsed output.</value>
     public MetadataGraphModel Graph { get; }
 
     /// <summary>
     /// Gets the canonical schema registry service.
     /// </summary>
+    /// <value>The registry service responsible for canonical entry and relationship storage.</value>
     public SchemaRegistryService SchemaRegistryService { get; }
 
     /// <summary>
     /// Gets the current source descriptor.
     /// </summary>
+    /// <value>The current source descriptor whose content is being processed.</value>
     public SourceDescriptorModel Source { get; }
 
     /// <summary>
     /// Gets the active target namespace.
     /// </summary>
+    /// <value>The target namespace currently in scope for qualified name resolution.</value>
     public string TargetNamespace { get; }
 
     /// <summary>
     /// Sets the nested item dispatcher used for recursive category handling.
     /// </summary>
     /// <param name="handler">The nested item dispatcher.</param>
+    /// <remarks>
+    /// The dispatcher is supplied after construction so handlers can recurse through a shared context without circular constructor dependencies.
+    /// </remarks>
     public void SetNestedItemHandler(Func<XElement, string?, int, CancellationToken, Task<string?>> handler)
     {
         nestedItemHandler = handler ?? throw new ArgumentNullException(nameof(handler));
@@ -65,6 +75,9 @@ internal sealed class ParsedItemContext
     /// <param name="localOrdinal">The zero-based ordinal within the parent scope.</param>
     /// <param name="cancellationToken">The cancellation token for the operation.</param>
     /// <returns>A task that returns the canonical reference identifier when one is produced.</returns>
+    /// <remarks>
+    /// Nested dispatch allows category handlers to reuse the shared dispatcher when inline complex or simple types appear inside broader parent items.
+    /// </remarks>
     public Task<string?> HandleNestedItemAsync(XElement item, string? parentRefId, int localOrdinal, CancellationToken cancellationToken)
     {
         return nestedItemHandler is null

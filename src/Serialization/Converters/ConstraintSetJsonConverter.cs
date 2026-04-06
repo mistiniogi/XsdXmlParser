@@ -5,7 +5,7 @@ using XsdXmlParser.Core.Models;
 namespace XsdXmlParser.Core.Serialization.Converters;
 
 /// <summary>
-/// Serializes normalized constraint-set payloads.
+/// Serializes normalized constraint-set payloads while preserving the compact occurrence and rule-shape contract used by graph JSON output.
 /// </summary>
 public sealed class ConstraintSetJsonConverter : JsonConverter<ConstraintSetModel>
 {

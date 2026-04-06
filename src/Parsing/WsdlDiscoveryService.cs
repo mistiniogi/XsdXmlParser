@@ -11,8 +11,19 @@ namespace XsdXmlParser.Core.Parsing;
 /// </summary>
 public sealed class WsdlDiscoveryService
 {
+    /// <summary>
+    /// The path resolution service used when referenced WSDL or XSD sources must be resolved.
+    /// </summary>
     private readonly ImportResolutionService? importResolutionService;
+
+    /// <summary>
+    /// The source identity provider used when discovered sources need canonical identifiers.
+    /// </summary>
     private readonly ISourceIdentityProvider? sourceIdentityProvider;
+
+    /// <summary>
+    /// The virtual file system used to inspect referenced sources.
+    /// </summary>
     private readonly IVirtualFileSystem? virtualFileSystem;
 
     /// <summary>
@@ -35,10 +46,22 @@ public sealed class WsdlDiscoveryService
         this.importResolutionService = importResolutionService ?? throw new ArgumentNullException(nameof(importResolutionService));
     }
 
+    /// <summary>
+    /// Gets the path resolution service used for referenced-source discovery.
+    /// </summary>
+    /// <value>The path resolution service used for referenced-source discovery.</value>
     private ImportResolutionService ImportResolutionService => importResolutionService ?? new ImportResolutionService(VirtualFileSystem);
 
+    /// <summary>
+    /// Gets the source identity provider used for discovered sources.
+    /// </summary>
+    /// <value>The source identity provider used for discovered sources.</value>
     private ISourceIdentityProvider SourceIdentityProvider => sourceIdentityProvider ?? new SourceIdentityProviderService();
 
+    /// <summary>
+    /// Gets the virtual file system used for referenced-source inspection.
+    /// </summary>
+    /// <value>The virtual file system used for referenced-source inspection.</value>
     private IVirtualFileSystem VirtualFileSystem => virtualFileSystem ?? new VirtualFileSystemService();
 
     /// <summary>
@@ -47,6 +70,9 @@ public sealed class WsdlDiscoveryService
     /// <param name="sources">The normalized parser sources.</param>
     /// <param name="cancellationToken">The cancellation token for the operation.</param>
     /// <returns>A task that returns the discovered source descriptors.</returns>
+    /// <remarks>
+    /// WSDL discovery expands imported WSDL documents and embedded or referenced XSD sources before graph construction begins.
+    /// </remarks>
     public async Task<IReadOnlyList<SourceDescriptorModel>> DiscoverAsync(IReadOnlyList<SourceDescriptorModel> sources, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -66,6 +92,13 @@ public sealed class WsdlDiscoveryService
         return discoveredDescriptors.Values.ToArray();
     }
 
+    /// <summary>
+    /// Creates a structured discovery failure for WSDL source inspection errors.
+    /// </summary>
+    /// <param name="source">The source being inspected.</param>
+    /// <param name="message">The failure message.</param>
+    /// <param name="innerException">The optional inner exception.</param>
+    /// <returns>The structured parse failure exception.</returns>
     private static ParseFailureException CreateDiscoveryFailure(SourceDescriptorModel source, string message, Exception? innerException = null)
     {
         var diagnostics = new[]
@@ -85,6 +118,15 @@ public sealed class WsdlDiscoveryService
         return new ParseFailureException(message, "wsdl-discovery", diagnostics, source.SourceId, innerException);
     }
 
+    /// <summary>
+    /// Discovers and registers one referenced WSDL or XSD source when it exists.
+    /// </summary>
+    /// <param name="source">The source that declared the reference.</param>
+    /// <param name="relativePath">The referenced relative path.</param>
+    /// <param name="documentKind">The document kind expected for the referenced source.</param>
+    /// <param name="discoveredDescriptors">The discovered descriptor map keyed by virtual path.</param>
+    /// <param name="cancellationToken">The cancellation token for the operation.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     private async Task DiscoverReferencedSourceAsync(SourceDescriptorModel source, string relativePath, ESchemaDocumentKind documentKind, IDictionary<string, SourceDescriptorModel> discoveredDescriptors, CancellationToken cancellationToken)
     {
         var resolvedPath = ImportResolutionService.Resolve(source.VirtualPath, relativePath);
@@ -108,6 +150,13 @@ public sealed class WsdlDiscoveryService
         discoveredDescriptors[resolvedPath] = descriptor;
     }
 
+    /// <summary>
+    /// Discovers WSDL imports and embedded schema references for one WSDL source.
+    /// </summary>
+    /// <param name="source">The WSDL source to inspect.</param>
+    /// <param name="discoveredDescriptors">The discovered descriptor map keyed by virtual path.</param>
+    /// <param name="cancellationToken">The cancellation token for the operation.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     private async Task DiscoverWsdlReferencesAsync(SourceDescriptorModel source, IDictionary<string, SourceDescriptorModel> discoveredDescriptors, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

@@ -4,12 +4,23 @@ using XsdXmlParser.Core.Models;
 namespace XsdXmlParser.Core.Parsing;
 
 /// <summary>
-/// Provides async XSD parse entry points for file-backed and string-backed inputs.
+/// Provides asynchronous XSD parse entry points for file-backed and string-backed inputs.
 /// </summary>
 public sealed class XsdParserService : IXsdParser
 {
+    /// <summary>
+    /// The compatibility graph builder used when the parser operates without the orchestration service.
+    /// </summary>
     private readonly IMetadataGraphBuilder? metadataGraphBuilder;
+
+    /// <summary>
+    /// The preferred orchestration service used by the primary request-model workflow.
+    /// </summary>
     private readonly IParserOrchestrationService? parserOrchestrationService;
+
+    /// <summary>
+    /// The compatibility source loader used when the parser operates without the orchestration service.
+    /// </summary>
     private readonly ISourceLoader? sourceLoader;
 
     /// <summary>

@@ -1,37 +1,37 @@
 namespace XsdXmlParser.Core.Models;
 
 /// <summary>
-/// Identifies the normalized relationship type between graph entries.
+/// Identifies the normalized relationship type recorded between canonical graph entries.
 /// </summary>
 public enum ERelationshipKind
 {
     /// <summary>
-    /// The source imports another source.
+    /// Indicates that one source imports another source.
     /// </summary>
     Import,
 
     /// <summary>
-    /// The source includes another source.
+    /// Indicates that one source includes another source.
     /// </summary>
     Include,
 
     /// <summary>
-    /// A parent contains a child entry.
+    /// Indicates that a parent entry contains a child entry.
     /// </summary>
     Contains,
 
     /// <summary>
-    /// An entry references another entry.
+    /// Indicates that an entry references another canonical entry.
     /// </summary>
     References,
 
     /// <summary>
-    /// An entry derives from another entry.
+    /// Indicates that an entry derives from another canonical entry.
     /// </summary>
     DerivesFrom,
 
     /// <summary>
-    /// An attribute belongs to an owning entry.
+    /// Indicates that an attribute belongs to an owning entry.
     /// </summary>
     AttributeOf,
 }

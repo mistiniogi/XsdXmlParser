@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace XsdXmlParser.Core.Serialization.Converters;
 
 /// <summary>
-/// Serializes occurrence markers such as numeric values or the unbounded sentinel.
+/// Serializes occurrence markers such as numeric values or the unbounded sentinel without losing their original semantic form.
 /// </summary>
 public sealed class OccurrenceValueJsonConverter : JsonConverter<string>
 {

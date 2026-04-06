@@ -6,7 +6,7 @@ using XsdXmlParser.Core.Parsing;
 namespace XsdXmlParser.Core.Abstractions;
 
 /// <summary>
-/// Provides a category-specific handler for one discovered schema or WSDL item.
+/// Provides a category-specific handler for a discovered schema or WSDL item during graph construction.
 /// </summary>
 internal interface IParsedItemHandler
 {
@@ -14,7 +14,7 @@ internal interface IParsedItemHandler
     /// Determines whether the handler supports the supplied item.
     /// </summary>
     /// <param name="item">The discovered XML item.</param>
-    /// <returns><see langword="true"/> when the handler supports the supplied item.</returns>
+    /// <returns><see langword="true"/> when the handler can translate the supplied item into normalized graph state.</returns>
     bool CanHandle(XElement item);
 
     /// <summary>
@@ -25,6 +25,6 @@ internal interface IParsedItemHandler
     /// <param name="parentRefId">The optional parent reference identifier.</param>
     /// <param name="localOrdinal">The zero-based ordinal within the parent scope.</param>
     /// <param name="cancellationToken">The cancellation token for the operation.</param>
-    /// <returns>A task that returns the canonical reference identifier when applicable.</returns>
+    /// <returns>A task that returns the canonical reference identifier when the handled item contributes a registered graph node.</returns>
     Task<string?> HandleAsync(ParsedItemContext context, XElement item, string? parentRefId, int localOrdinal, CancellationToken cancellationToken);
 }
