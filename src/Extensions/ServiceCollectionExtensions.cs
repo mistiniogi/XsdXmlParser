@@ -20,7 +20,7 @@ public static class ServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
 
-        services
+        return services
             .AddSingleton<RefIdFactory>()
             .AddSingleton<SourceGraphRegistry>()
             .AddSingleton<TypeRegistry>()
@@ -35,7 +35,5 @@ public static class ServiceCollectionExtensions
             .AddScoped<IXsdParser, XsdParserService>()
             .AddScoped<IWsdlParser, WsdlParserService>()
             .AddSingleton<IMetadataGraphSerializer, MetadataGraphJsonSerializer>();
-
-        return services;
     }
 }

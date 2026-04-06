@@ -19,7 +19,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <NoWarn>$(NoWarn);IDE0007;CS0162;SA1101</NoWarn>
+    <NoWarn>$(NoWarn);IDE0007;IDE0008;CS0162;SA1101</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
