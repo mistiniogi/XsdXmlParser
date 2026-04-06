@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>10.0</LangVersion>
+    <RootNamespace>XsdXmlParser.Core</RootNamespace>
+    <AssemblyName>XsdXmlParser.Core</AssemblyName>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);IDE0007;CS0162;SA1101</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+    <PackageReference Include="AsyncFixer" Version="1.6.0" PrivateAssets="all" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.10.0.116480" PrivateAssets="all" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <Compile Remove="tests/**/*.cs" />
+  </ItemGroup>
+
+  <!-- NuGet metadata -->
+  <PropertyGroup>
+    <PackageId>XsdXmlParser.Core</PackageId>
+    <Version>1.0.0</Version>
+    <Title>XsdXmlParser.Core</Title>
+    <Authors>sndjones</Authors>
+    <Company>NDigital</Company>
+    <Description>A production-grade NuGet library for parsing WSDL 1.1 and XSD schemas, generating JSON metadata and XML output with an async-first API, centralized ID-based registry, and C# 10.0 compatibility.</Description>
+    <Summary>Parse WSDL 1.1 and XSD schemas to generate JSON metadata and XML with schema-first design, DI-friendly abstractions, and graph traversal.</Summary>
+    <PackageTags>wsdl;xsd;xml;json;schema-parser;soap;web-services;graph-traversal;clean-architecture;dotnet;dotnet6;dotnet7;dotnet8;async;nuget</PackageTags>
+    <RepositoryUrl>https://github.com/mistiniogi/XsdXmlParser</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/mistiniogi/XsdXmlParser</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Copyright>Copyright © 2026 sndjones. All rights reserved.</Copyright>
+    <PackageReleaseNotes>v1.0.0: Initial stable release - WSDL 1.1 parser, XSD schema parser, JSON metadata generation, XML output generation, centralized ID-based type registry, async-first APIs, and support for net6.0, net7.0, and net8.0 on C# 10.0.</PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Language>en-US</Language>
+    <MinClientVersion>5.0</MinClientVersion>
+    <RepositoryBranch>main</RepositoryBranch>
+  </PropertyGroup>
+
+</Project>
