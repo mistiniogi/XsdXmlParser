@@ -6,12 +6,17 @@ namespace XsdXmlParser.Core.Models;
 public sealed class SourceDescriptorModel
 {
     /// <summary>
+    /// Gets or sets the caller-declared document kind.
+    /// </summary>
+    public ESchemaDocumentKind DocumentKind { get; set; }
+
+    /// <summary>
     /// Gets or sets the stable logical source identifier.
     /// </summary>
     public string SourceId { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the source origin kind.
+    /// Gets or sets the normalized source origin kind.
     /// </summary>
     public ESourceKind SourceKind { get; set; }
 
