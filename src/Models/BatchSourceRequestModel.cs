@@ -6,6 +6,11 @@ namespace XsdXmlParser.Core.Models;
 public sealed class BatchSourceRequestModel
 {
     /// <summary>
+    /// Gets or sets the caller-declared document kind.
+    /// </summary>
+    public ESchemaDocumentKind DocumentKind { get; set; }
+
+    /// <summary>
     /// Gets or sets the logical name used for source identity and matching.
     /// </summary>
     public string LogicalName { get; set; } = string.Empty;

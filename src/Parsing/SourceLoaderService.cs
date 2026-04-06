@@ -9,18 +9,82 @@ namespace XsdXmlParser.Core.Parsing;
 public sealed class SourceLoaderService : ISourceLoader
 {
     private readonly ISourceIdentityProvider sourceIdentityProvider;
+    private readonly IVirtualFileSystem virtualFileSystem;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SourceLoaderService"/> class.
     /// </summary>
     /// <param name="sourceIdentityProvider">The logical source identity provider.</param>
-    public SourceLoaderService(ISourceIdentityProvider sourceIdentityProvider)
+    /// <param name="virtualFileSystem">The virtual file system used to normalize content-backed sources.</param>
+    public SourceLoaderService(ISourceIdentityProvider sourceIdentityProvider, IVirtualFileSystem virtualFileSystem)
     {
         this.sourceIdentityProvider = sourceIdentityProvider ?? throw new ArgumentNullException(nameof(sourceIdentityProvider));
+        this.virtualFileSystem = virtualFileSystem ?? throw new ArgumentNullException(nameof(virtualFileSystem));
     }
 
     /// <inheritdoc/>
-    public Task<IReadOnlyList<SourceDescriptorModel>> LoadBatchAsync(IEnumerable<BatchSourceRequestModel> sources, CancellationToken cancellationToken)
+    public Task<IReadOnlyList<SourceDescriptorModel>> LoadAsync(BatchParseRequestModel request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        return LoadBatchAsync(request.Sources, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public Task<SourceDescriptorModel> LoadAsync(FilePathParseRequestModel request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        ThrowIfNullOrWhiteSpace(request.FilePath, nameof(request.FilePath));
+        var displayName = string.IsNullOrWhiteSpace(request.DisplayName) ? Path.GetFileName(request.FilePath) : request.DisplayName;
+        var logicalPath = string.IsNullOrWhiteSpace(request.LogicalPath) ? request.FilePath : request.LogicalPath;
+
+        return CreateFileDescriptorAsync(request.FilePath, displayName, logicalPath, request.DocumentKind, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public async Task<SourceDescriptorModel> LoadAsync(MemoryParseRequestModel request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var displayName = RequireValue(request.DisplayName, nameof(request.DisplayName), "memory-source", null, "source-loading");
+        var logicalPath = RequireValue(request.LogicalPath, nameof(request.LogicalPath), null, null, "source-loading");
+
+        if (request.Buffer.IsEmpty)
+        {
+            throw CreateValidationFailure("Memory inputs must not be empty.", "source-loading", logicalPath, null);
+        }
+
+        var virtualFile = await virtualFileSystem.OpenMemoryAsync(logicalPath, request.Buffer, cancellationToken).ConfigureAwait(false);
+        return CreateDescriptor(displayName, logicalPath, ESourceKind.Memory, request.DocumentKind, false, virtualFile.VirtualPath, virtualFile.ContentLength);
+    }
+
+    /// <inheritdoc/>
+    public async Task<SourceDescriptorModel> LoadAsync(StreamParseRequestModel request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var displayName = RequireValue(request.DisplayName, nameof(request.DisplayName), "stream-source", null, "source-loading");
+        var logicalPath = RequireValue(request.LogicalPath, nameof(request.LogicalPath), null, null, "source-loading");
+
+        if (request.Content is null)
+        {
+            throw CreateValidationFailure("Stream inputs must not be null.", "source-loading", logicalPath, null);
+        }
+
+        if (!request.Content.CanRead || !request.Content.CanSeek)
+        {
+            throw CreateValidationFailure("Stream inputs must be readable and seekable.", "source-loading", logicalPath, null);
+        }
+
+        var virtualFile = await virtualFileSystem.OpenStreamAsync(logicalPath, request.Content, cancellationToken).ConfigureAwait(false);
+        return CreateDescriptor(displayName, logicalPath, ESourceKind.Stream, request.DocumentKind, false, virtualFile.VirtualPath, virtualFile.ContentLength);
+    }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyList<SourceDescriptorModel>> LoadBatchAsync(IEnumerable<BatchSourceRequestModel> sources, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(sources);
@@ -28,93 +92,103 @@ public sealed class SourceLoaderService : ISourceLoader
         var descriptors = new List<SourceDescriptorModel>();
         foreach (var source in sources)
         {
-            ArgumentNullException.ThrowIfNull(source);
-            var descriptor = new SourceDescriptorModel
+            if (source is null)
             {
-                DisplayName = source.LogicalName,
-                IsMainSource = source.IsMain,
-                LogicalName = source.LogicalName,
-                RelativePath = source.LogicalPath,
-                SourceKind = ESourceKind.BatchStream,
-                VirtualPath = source.LogicalPath,
-            };
+                throw CreateValidationFailure("Batch requests must not include null sources.", "source-loading", null, null);
+            }
 
-            descriptor.SourceId = sourceIdentityProvider.GetOrCreateIdentity(descriptor);
-            descriptors.Add(descriptor);
+            ThrowIfNullOrWhiteSpace(source.LogicalName, nameof(source.LogicalName));
+            ThrowIfNullOrWhiteSpace(source.LogicalPath, nameof(source.LogicalPath));
+
+            if (source.Content is null)
+            {
+                throw CreateValidationFailure("Batch source streams must not be null.", "source-loading", source.LogicalPath, source.LogicalName);
+            }
+
+            if (!source.Content.CanRead || !source.Content.CanSeek)
+            {
+                throw CreateValidationFailure("Batch source streams must be readable and seekable.", "source-loading", source.LogicalPath, source.LogicalName);
+            }
+
+            var virtualFile = await virtualFileSystem.OpenStreamAsync(source.LogicalPath, source.Content, cancellationToken).ConfigureAwait(false);
+            descriptors.Add(CreateDescriptor(source.LogicalName, source.LogicalPath, ESourceKind.BatchStream, source.DocumentKind, source.IsMain, virtualFile.VirtualPath, virtualFile.ContentLength));
+        }
+
+        if (descriptors.Count == 0)
+        {
+            throw CreateValidationFailure("Batch requests must contain at least one source.", "source-loading", null, null);
         }
 
         sourceIdentityProvider.ValidateUniqueIdentities(descriptors);
-        return Task.FromResult<IReadOnlyList<SourceDescriptorModel>>(descriptors);
+        return descriptors;
     }
 
     /// <inheritdoc/>
     public Task<SourceDescriptorModel> LoadFromFileAsync(string filePath, CancellationToken cancellationToken)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        ThrowIfNullOrWhiteSpace(filePath, nameof(filePath));
-
-        var descriptor = new SourceDescriptorModel
-        {
-            DisplayName = Path.GetFileName(filePath),
-            LogicalName = Path.GetFileName(filePath),
-            RelativePath = filePath,
-            SourceKind = ESourceKind.FilePath,
-            VirtualPath = filePath,
-        };
-
-        descriptor.SourceId = sourceIdentityProvider.GetOrCreateIdentity(descriptor);
-        return Task.FromResult(descriptor);
+        return CreateFileDescriptorAsync(filePath, Path.GetFileName(filePath), filePath, InferDocumentKind(filePath), cancellationToken);
     }
 
     /// <inheritdoc/>
     public Task<SourceDescriptorModel> LoadFromMemoryAsync(string logicalName, string logicalPath, ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        ThrowIfNullOrWhiteSpace(logicalName, nameof(logicalName));
-        ThrowIfNullOrWhiteSpace(logicalPath, nameof(logicalPath));
-
-        if (buffer.IsEmpty)
-        {
-            throw new InvalidOperationException("Memory inputs must not be empty.");
-        }
-
-        var descriptor = new SourceDescriptorModel
-        {
-            DisplayName = logicalName,
-            LogicalName = logicalName,
-            RelativePath = logicalPath,
-            SourceKind = ESourceKind.Memory,
-            VirtualPath = logicalPath,
-        };
-
-        descriptor.SourceId = sourceIdentityProvider.GetOrCreateIdentity(descriptor);
-        return Task.FromResult(descriptor);
+        return LoadAsync(
+            new MemoryParseRequestModel
+            {
+                Buffer = buffer,
+                DisplayName = logicalName,
+                DocumentKind = InferDocumentKind(logicalPath),
+                LogicalPath = logicalPath,
+            },
+            cancellationToken);
     }
 
     /// <inheritdoc/>
     public Task<SourceDescriptorModel> LoadFromStreamAsync(string logicalName, string logicalPath, Stream stream, CancellationToken cancellationToken)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        ThrowIfNullOrWhiteSpace(logicalName, nameof(logicalName));
-        ThrowIfNullOrWhiteSpace(logicalPath, nameof(logicalPath));
-        ArgumentNullException.ThrowIfNull(stream);
+        return LoadAsync(
+            new StreamParseRequestModel
+            {
+                Content = stream,
+                DisplayName = logicalName,
+                DocumentKind = InferDocumentKind(logicalPath),
+                LogicalPath = logicalPath,
+            },
+            cancellationToken);
+    }
 
-        if (!stream.CanRead || !stream.CanSeek)
+    private static ParseFailureException CreateValidationFailure(string message, string stage, string? virtualPath, string? sourceId)
+    {
+        var diagnostics = new[]
         {
-            throw new InvalidOperationException("Stream inputs must be readable and seekable.");
-        }
-
-        var descriptor = new SourceDescriptorModel
-        {
-            DisplayName = logicalName,
-            LogicalName = logicalName,
-            RelativePath = logicalPath,
-            SourceKind = ESourceKind.Stream,
-            VirtualPath = logicalPath,
+            new ParseDiagnosticModel
+            {
+                Code = "invalid-request",
+                DiagnosticId = Guid.NewGuid().ToString("N"),
+                Message = message,
+                SourceId = sourceId,
+                Stage = stage,
+                VirtualPath = virtualPath,
+            },
         };
 
-        descriptor.SourceId = sourceIdentityProvider.GetOrCreateIdentity(descriptor);
-        return Task.FromResult(descriptor);
+        return new ParseFailureException(message, stage, diagnostics, sourceId);
+    }
+
+    private static ESchemaDocumentKind InferDocumentKind(string logicalPath)
+    {
+        var extension = Path.GetExtension(logicalPath);
+        return string.Equals(extension, ".wsdl", StringComparison.OrdinalIgnoreCase)
+            ? ESchemaDocumentKind.Wsdl
+            : ESchemaDocumentKind.Xsd;
+    }
+
+    private static string RequireValue(string? value, string paramName, string? fallback, string? sourceId, string stage)
+    {
+        var resolvedValue = string.IsNullOrWhiteSpace(value) ? fallback : value;
+        return string.IsNullOrWhiteSpace(resolvedValue)
+            ? throw CreateValidationFailure($"A value is required for '{paramName}'.", stage, null, sourceId)
+            : resolvedValue;
     }
 
     private static void ThrowIfNullOrWhiteSpace(string value, string paramName)
@@ -123,5 +197,41 @@ public sealed class SourceLoaderService : ISourceLoader
         {
             throw new ArgumentException("Value cannot be null or whitespace.", paramName);
         }
+    }
+
+    private async Task<SourceDescriptorModel> CreateFileDescriptorAsync(string filePath, string displayName, string logicalPath, ESchemaDocumentKind documentKind, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        ThrowIfNullOrWhiteSpace(filePath, nameof(filePath));
+
+        if (!await virtualFileSystem.ExistsAsync(filePath, cancellationToken).ConfigureAwait(false))
+        {
+            throw CreateValidationFailure($"The file '{filePath}' could not be found.", "source-loading", logicalPath, displayName);
+        }
+
+        var virtualFile = await virtualFileSystem.OpenFileAsync(filePath, cancellationToken).ConfigureAwait(false);
+        return CreateDescriptor(displayName, logicalPath, ESourceKind.FilePath, documentKind, true, virtualFile.VirtualPath, virtualFile.ContentLength);
+    }
+
+    private SourceDescriptorModel CreateDescriptor(string displayName, string logicalPath, ESourceKind sourceKind, ESchemaDocumentKind documentKind, bool isMainSource, string virtualPath, long? contentLength)
+    {
+        var descriptor = new SourceDescriptorModel
+        {
+            DisplayName = displayName,
+            DocumentKind = documentKind,
+            IsMainSource = isMainSource,
+            LogicalName = displayName,
+            RelativePath = logicalPath,
+            SourceKind = sourceKind,
+            VirtualPath = virtualPath,
+        };
+
+        if (contentLength.HasValue)
+        {
+            descriptor.ContentFingerprint = contentLength.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        descriptor.SourceId = sourceIdentityProvider.GetOrCreateIdentity(descriptor);
+        return descriptor;
     }
 }

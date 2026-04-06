@@ -11,6 +11,38 @@ namespace XsdXmlParser.Core.Abstractions;
 public interface ISourceLoader
 {
     /// <summary>
+    /// Normalizes a file-backed parse request.
+    /// </summary>
+    /// <param name="request">The file-backed request to normalize.</param>
+    /// <param name="cancellationToken">The cancellation token for the operation.</param>
+    /// <returns>A task that returns the normalized source descriptor.</returns>
+    Task<SourceDescriptorModel> LoadAsync(FilePathParseRequestModel request, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Normalizes a stream-backed parse request.
+    /// </summary>
+    /// <param name="request">The stream-backed request to normalize.</param>
+    /// <param name="cancellationToken">The cancellation token for the operation.</param>
+    /// <returns>A task that returns the normalized source descriptor.</returns>
+    Task<SourceDescriptorModel> LoadAsync(StreamParseRequestModel request, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Normalizes a memory-backed parse request.
+    /// </summary>
+    /// <param name="request">The memory-backed request to normalize.</param>
+    /// <param name="cancellationToken">The cancellation token for the operation.</param>
+    /// <returns>A task that returns the normalized source descriptor.</returns>
+    Task<SourceDescriptorModel> LoadAsync(MemoryParseRequestModel request, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Normalizes a coordinated multi-source parse request.
+    /// </summary>
+    /// <param name="request">The batch request to normalize.</param>
+    /// <param name="cancellationToken">The cancellation token for the operation.</param>
+    /// <returns>A task that returns the normalized source descriptors.</returns>
+    Task<IReadOnlyList<SourceDescriptorModel>> LoadAsync(BatchParseRequestModel request, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Normalizes a file-backed source.
     /// </summary>
     /// <param name="filePath">The input file path.</param>

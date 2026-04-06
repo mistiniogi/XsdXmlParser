@@ -9,6 +9,7 @@ namespace XsdXmlParser.Core.Registry;
 public sealed class SourceGraphRegistry
 {
     private readonly Dictionary<string, SourceDescriptorModel> descriptors = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, SourceDescriptorModel> descriptorsByVirtualPath = new(StringComparer.Ordinal);
     private readonly HashSet<string> resolvingSources = new(StringComparer.Ordinal);
 
     /// <summary>
@@ -19,6 +20,7 @@ public sealed class SourceGraphRegistry
     {
         ArgumentNullException.ThrowIfNull(descriptor);
         descriptors[descriptor.SourceId] = descriptor;
+        descriptorsByVirtualPath[descriptor.VirtualPath] = descriptor;
     }
 
     /// <summary>
@@ -30,6 +32,26 @@ public sealed class SourceGraphRegistry
     public bool TryGetDescriptor(string sourceId, out SourceDescriptorModel descriptor)
     {
         return descriptors.TryGetValue(sourceId, out descriptor!);
+    }
+
+    /// <summary>
+    /// Attempts to retrieve a registered source descriptor by virtual path.
+    /// </summary>
+    /// <param name="virtualPath">The virtual path to retrieve.</param>
+    /// <param name="descriptor">The matching descriptor when present.</param>
+    /// <returns><see langword="true"/> when the descriptor is present.</returns>
+    public bool TryGetDescriptorByVirtualPath(string virtualPath, out SourceDescriptorModel descriptor)
+    {
+        return descriptorsByVirtualPath.TryGetValue(virtualPath, out descriptor!);
+    }
+
+    /// <summary>
+    /// Gets the registered source descriptors.
+    /// </summary>
+    /// <returns>The registered source descriptors.</returns>
+    public IReadOnlyCollection<SourceDescriptorModel> GetDescriptors()
+    {
+        return descriptors.Values.ToArray();
     }
 
     /// <summary>

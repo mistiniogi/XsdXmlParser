@@ -37,4 +37,75 @@ public sealed class TypeRegistry
     /// Gets the relationship dictionary.
     /// </summary>
     public Dictionary<string, RelationshipModel> Relationships { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// Stores a canonical complex type.
+    /// </summary>
+    /// <param name="model">The model to store.</param>
+    public void Store(ComplexTypeModel model)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+        ComplexTypes[model.RefId] = model;
+    }
+
+    /// <summary>
+    /// Stores a canonical simple type.
+    /// </summary>
+    /// <param name="model">The model to store.</param>
+    public void Store(SimpleTypeModel model)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+        SimpleTypes[model.RefId] = model;
+    }
+
+    /// <summary>
+    /// Stores a canonical element.
+    /// </summary>
+    /// <param name="model">The model to store.</param>
+    public void Store(ElementModel model)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+        Elements[model.RefId] = model;
+    }
+
+    /// <summary>
+    /// Stores a canonical attribute.
+    /// </summary>
+    /// <param name="model">The model to store.</param>
+    public void Store(AttributeModel model)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+        Attributes[model.RefId] = model;
+    }
+
+    /// <summary>
+    /// Stores a normalized validation rule.
+    /// </summary>
+    /// <param name="model">The model to store.</param>
+    public void Store(ConstraintSetModel model)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+        ValidationRules[model.RuleId] = model;
+    }
+
+    /// <summary>
+    /// Stores a normalized relationship.
+    /// </summary>
+    /// <param name="model">The model to store.</param>
+    public void Store(RelationshipModel model)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+        Relationships[model.RelationshipId] = model;
+    }
+
+    /// <summary>
+    /// Attempts to retrieve a complex type by reference identifier.
+    /// </summary>
+    /// <param name="refId">The reference identifier to inspect.</param>
+    /// <param name="model">The matching model when present.</param>
+    /// <returns><see langword="true"/> when the model is present.</returns>
+    public bool TryGetComplexType(string refId, out ComplexTypeModel model)
+    {
+        return ComplexTypes.TryGetValue(refId, out model!);
+    }
 }

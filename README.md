@@ -1,33 +1,123 @@
 # XsdXmlParser.Core
 
-Production-grade NuGet library for parsing WSDL 1.1 and XSD schemas, building a centralized ID-based type registry, and generating JSON metadata and XML output.
+`XsdXmlParser.Core` is a multi-targeted .NET library for parsing WSDL 1.1 and XSD sources into a normalized metadata graph with canonical reference identifiers, relationship metadata, and serializer hints.
 
-## Engineering Direction
+## Targets
 
-- Targets `net6.0`, `net7.0`, and `net8.0`
-- Shared production code remains compatible with C# 10.0
-- Public parsing and generation APIs are async-first
-- All C# classes, structs, enums, properties, methods, and other shared production declarations carry XML documentation tags appropriate to their shape
-- Core services are designed for dependency injection and testability
-- Complex traversal and normalization logic uses inline `Why` comments where intent is non-obvious
-- Type definitions are canonicalized through a centralized registry to enforce DRY
+- `net6.0`
+- `net7.0`
+- `net8.0`
+- C# 10.0-compatible shared production code
 
-## Planning Tooling
+## Main Entry Point
 
-This repository uses Spec Kit artifacts under `.specify/` and `specs/` to manage feature planning, constitution checks, and implementation tasks.
+The primary consumer-facing API is `IParserOrchestrationService`, registered through `AddXsdXmlParser()`.
 
-## Planned Source Layout
+```csharp
+var services = new ServiceCollection();
+services.AddXsdXmlParser();
 
-- `src/Abstractions`: parser, loader, VFS, and serializer contracts
-- `src/Models`: normalized graph, source, registry, and diagnostic models
-- `src/Registry`: canonical registration, source traversal state, and deterministic `RefId` helpers
-- `src/Parsing`: source normalization, schema discovery, and two-pass linkage services
-- `src/Serialization`: `System.Text.Json` graph serialization and targeted converters
+using var serviceProvider = services.BuildServiceProvider();
+var parser = serviceProvider.GetRequiredService<IParserOrchestrationService>();
+```
+
+## Supported Request Shapes
+
+- `FilePathParseRequestModel`
+- `StreamParseRequestModel`
+- `MemoryParseRequestModel`
+- `BatchParseRequestModel`
+
+Every request must declare `DocumentKind` explicitly as `ESchemaDocumentKind.Wsdl` or `ESchemaDocumentKind.Xsd`.
+
+## Parse A WSDL File
+
+```csharp
+var graph = await parser.ParseFileAsync(
+	new FilePathParseRequestModel
+	{
+		FilePath = "schemas/service.wsdl",
+		DisplayName = "service.wsdl",
+		LogicalPath = "schemas/service.wsdl",
+		DocumentKind = ESchemaDocumentKind.Wsdl,
+	},
+	cancellationToken);
+```
+
+## Parse An XSD Stream
+
+```csharp
+await using var stream = File.OpenRead("schemas/types.xsd");
+
+var graph = await parser.ParseStreamAsync(
+	new StreamParseRequestModel
+	{
+		Content = stream,
+		DisplayName = "types.xsd",
+		LogicalPath = "schemas/types.xsd",
+		DocumentKind = ESchemaDocumentKind.Xsd,
+	},
+	cancellationToken);
+```
+
+## Parse A Batch
+
+```csharp
+var graph = await parser.ParseBatchAsync(
+	new BatchParseRequestModel
+	{
+		Sources = new[]
+		{
+			new BatchSourceRequestModel
+			{
+				LogicalName = "main.wsdl",
+				LogicalPath = "schemas/main.wsdl",
+				Content = File.OpenRead("schemas/main.wsdl"),
+				DocumentKind = ESchemaDocumentKind.Wsdl,
+				IsMain = true,
+			},
+			new BatchSourceRequestModel
+			{
+				LogicalName = "types.xsd",
+				LogicalPath = "schemas/types.xsd",
+				Content = File.OpenRead("schemas/types.xsd"),
+				DocumentKind = ESchemaDocumentKind.Xsd,
+			},
+		},
+	},
+	cancellationToken);
+```
+
+## Failure Contract
+
+Invalid requests and parse-stage failures throw `ParseFailureException`. The exception exposes structured `ParseDiagnosticModel` entries, the failure stage, and the primary failing source when available.
+
+```csharp
+try
+{
+	await parser.ParseFileAsync(request, cancellationToken);
+}
+catch (ParseFailureException ex)
+{
+	foreach (var diagnostic in ex.Diagnostics)
+	{
+		Console.WriteLine($"{diagnostic.Stage}: {diagnostic.Code} - {diagnostic.Message}");
+	}
+}
+```
+
+## Parsing Pipeline
+
+1. `ISourceLoader` validates and normalizes the request into `SourceDescriptorModel` entries.
+2. `WsdlDiscoveryService` expands WSDL imports and schema references before graph construction.
+3. `XsdGraphBuilder` walks WSDL inline schemas and XSD documents, dispatching category-specific items to dedicated handlers.
+4. Registry services canonicalize types, elements, attributes, relationships, and constraint metadata into `MetadataGraphModel`.
+
+## Repository Structure
+
+- `src/Abstractions`: public contracts and internal parsing seams
+- `src/Models`: request models, graph models, diagnostics, and exceptions
+- `src/Registry`: canonical registration and reference identifier helpers
+- `src/Parsing`: source loading, WSDL discovery, orchestration, and item handlers
+- `src/Serialization`: graph serialization support
 - `src/Extensions`: dependency injection registration
-
-## Planned Parsing Flow
-
-1. Normalize input sources into stable logical identities and paths.
-2. Discover reachable schemas and register canonical shells in Pass 1.
-3. Link references, constraints, and flattened compositor metadata in Pass 2.
-4. Serialize the normalized graph for downstream validation and generation workflows.

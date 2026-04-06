@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using XsdXmlParser.Core.Abstractions;
+using XsdXmlParser.Core.Models;
 using XsdXmlParser.Core.Parsing;
 using XsdXmlParser.Core.Registry;
 using XsdXmlParser.Core.Serialization;
@@ -27,8 +28,20 @@ public static class ServiceCollectionExtensions
             .AddSingleton<SchemaRegistryService>()
             .AddSingleton<ISourceIdentityProvider, SourceIdentityProviderService>()
             .AddSingleton<IVirtualFileSystem, VirtualFileSystemService>()
+            .AddScoped<IParsedItemHandler, ComplexTypeParsedItemHandler>()
+            .AddScoped<IParsedItemHandler, SimpleTypeParsedItemHandler>()
+            .AddScoped<IParsedItemHandler, ElementParsedItemHandler>()
+            .AddScoped<IParsedItemHandler, AttributeParsedItemHandler>()
+            .AddScoped<IParsedItemHandler, WsdlServiceParsedItemHandler>()
             .AddScoped<ISourceLoader, SourceLoaderService>()
-            .AddScoped<IMetadataGraphBuilder, XsdGraphBuilder>()
+            .AddScoped<IParserOrchestrationService, ParserOrchestrationService>()
+            .AddScoped<IMetadataGraphBuilder>(serviceProvider => new XsdGraphBuilder(
+                serviceProvider.GetRequiredService<SchemaRegistryService>(),
+                serviceProvider.GetRequiredService<SourceGraphRegistry>(),
+                serviceProvider.GetRequiredService<IVirtualFileSystem>(),
+                serviceProvider.GetRequiredService<ISourceIdentityProvider>(),
+                serviceProvider.GetRequiredService<ImportResolutionService>(),
+                serviceProvider.GetServices<IParsedItemHandler>()))
             .AddScoped<ImportResolutionService>()
             .AddScoped<GraphLinkingService>()
             .AddScoped<WsdlDiscoveryService>()
