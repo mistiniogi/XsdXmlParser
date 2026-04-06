@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="MultiNamespaceCollisionService"
+    targetNamespace="urn:fixtures:multi-namespace-collision"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="urn:fixtures:multi-namespace-collision"
+    xmlns:reqa="urn:fixtures:multi-namespace-collision:request-a"
+    xmlns:reqb="urn:fixtures:multi-namespace-collision:request-b"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <xsd:schema targetNamespace="urn:fixtures:multi-namespace-collision:request-a" elementFormDefault="qualified">
+      <xsd:complexType name="RequestType">
+        <xsd:sequence>
+          <xsd:element name="customerId" type="xsd:string" />
+          <xsd:element name="regionCode" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="ResponseType">
+        <xsd:sequence>
+          <xsd:element name="decision" type="xsd:string" />
+          <xsd:element name="confidence" type="xsd:decimal" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="Request" type="reqa:RequestType" />
+      <xsd:element name="Response" type="reqa:ResponseType" />
+    </xsd:schema>
+    <xsd:schema targetNamespace="urn:fixtures:multi-namespace-collision:request-b" elementFormDefault="qualified">
+      <xsd:complexType name="RequestType">
+        <xsd:sequence>
+          <xsd:element name="supplierId" type="xsd:string" />
+          <xsd:element name="effectiveDate" type="xsd:date" />
+          <xsd:element name="routingCode" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="ResponseType">
+        <xsd:sequence>
+          <xsd:element name="accepted" type="xsd:boolean" />
+          <xsd:element name="reviewCode" type="xsd:string" minOccurs="0" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="Request" type="reqb:RequestType" />
+      <xsd:element name="Response" type="reqb:ResponseType" />
+    </xsd:schema>
+    <xsd:schema targetNamespace="urn:fixtures:multi-namespace-collision" elementFormDefault="qualified">
+      <xsd:complexType name="ResolutionFaultType">
+        <xsd:sequence>
+          <xsd:element name="faultCode" type="xsd:string" />
+          <xsd:element name="faultMessage" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="ResolutionFault" type="tns:ResolutionFaultType" />
+    </xsd:schema>
+  </types>
+  <message name="ResolveCustomerInput">
+    <part name="parameters" element="reqa:Request" />
+  </message>
+  <message name="ResolveCustomerOutput">
+    <part name="parameters" element="reqa:Response" />
+  </message>
+  <message name="ResolveSupplierInput">
+    <part name="parameters" element="reqb:Request" />
+  </message>
+  <message name="ResolveSupplierOutput">
+    <part name="parameters" element="reqb:Response" />
+  </message>
+  <message name="ResolutionFaultMessage">
+    <part name="fault" element="tns:ResolutionFault" />
+  </message>
+  <portType name="MultiNamespaceCollisionPortType">
+    <operation name="ResolveCustomer">
+      <input message="tns:ResolveCustomerInput" />
+      <output message="tns:ResolveCustomerOutput" />
+      <fault name="ResolutionFault" message="tns:ResolutionFaultMessage" />
+    </operation>
+    <operation name="ResolveSupplier">
+      <input message="tns:ResolveSupplierInput" />
+      <output message="tns:ResolveSupplierOutput" />
+      <fault name="ResolutionFault" message="tns:ResolutionFaultMessage" />
+    </operation>
+  </portType>
+  <binding name="MultiNamespaceCollisionBinding" type="tns:MultiNamespaceCollisionPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="ResolveCustomer">
+      <soap:operation soapAction="urn:fixtures:multi-namespace-collision:ResolveCustomer" />
+      <input><soap:body use="literal" /></input>
+      <output><soap:body use="literal" /></output>
+      <fault name="ResolutionFault"><soap:fault name="ResolutionFault" use="literal" /></fault>
+    </operation>
+    <operation name="ResolveSupplier">
+      <soap:operation soapAction="urn:fixtures:multi-namespace-collision:ResolveSupplier" />
+      <input><soap:body use="literal" /></input>
+      <output><soap:body use="literal" /></output>
+      <fault name="ResolutionFault"><soap:fault name="ResolutionFault" use="literal" /></fault>
+    </operation>
+  </binding>
+  <service name="MultiNamespaceCollisionService">
+    <port name="MultiNamespaceCollisionPort" binding="tns:MultiNamespaceCollisionBinding">
+      <soap:address location="http://example.com/multi-namespace-collision" />
+    </port>
+  </service>
+</definitions>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="LegacyRpcEncodedCatalogService"
+    targetNamespace="urn:fixtures:legacy-rpc-encoded"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+    xmlns:tns="urn:fixtures:legacy-rpc-encoded"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <xsd:schema targetNamespace="urn:fixtures:legacy-rpc-encoded" elementFormDefault="qualified">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:complexType name="ArrayOfString">
+        <xsd:complexContent>
+          <xsd:restriction base="soapenc:Array">
+            <xsd:attribute ref="soapenc:arrayType" wsdl:arrayType="xsd:string[]" />
+          </xsd:restriction>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:complexType name="WrappedSkuListType">
+        <xsd:sequence>
+          <xsd:element name="sku" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="WrappedSearchRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="customerId" type="xsd:string" />
+            <xsd:element name="itemCodes" type="tns:WrappedSkuListType" />
+            <xsd:element name="includeBackorder" type="xsd:boolean" />
+            <xsd:element name="maxResults" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="WrappedSearchResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="matches" type="tns:WrappedSkuListType" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="LegacySearchCatalogInput">
+    <part name="sessionToken" type="xsd:string" />
+    <part name="customerId" type="xsd:string" />
+    <part name="itemCodes" type="tns:ArrayOfString" />
+    <part name="includeBackorder" type="xsd:boolean" />
+    <part name="maxResults" type="xsd:int" />
+  </message>
+  <message name="LegacySearchCatalogOutput">
+    <part name="matches" type="tns:ArrayOfString" />
+    <part name="resultCount" type="xsd:int" />
+  </message>
+  <message name="WrappedSearchCatalogInput">
+    <part name="parameters" element="tns:WrappedSearchRequest" />
+  </message>
+  <message name="WrappedSearchCatalogOutput">
+    <part name="parameters" element="tns:WrappedSearchResponse" />
+  </message>
+  <portType name="LegacyCatalogRpcPortType">
+    <operation name="SearchCatalogLegacy" parameterOrder="sessionToken customerId itemCodes includeBackorder maxResults">
+      <input message="tns:LegacySearchCatalogInput" />
+      <output message="tns:LegacySearchCatalogOutput" />
+    </operation>
+  </portType>
+  <portType name="ModernCatalogDocumentPortType">
+    <operation name="SearchCatalogWrapped">
+      <input message="tns:WrappedSearchCatalogInput" />
+      <output message="tns:WrappedSearchCatalogOutput" />
+    </operation>
+  </portType>
+  <binding name="LegacyCatalogRpcBinding" type="tns:LegacyCatalogRpcPortType">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="SearchCatalogLegacy">
+      <soap:operation soapAction="urn:fixtures:legacy-rpc-encoded:SearchCatalogLegacy" />
+      <input>
+        <soap:body use="encoded" namespace="urn:fixtures:legacy-rpc-encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="urn:fixtures:legacy-rpc-encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </output>
+    </operation>
+  </binding>
+  <binding name="ModernCatalogDocumentBinding" type="tns:ModernCatalogDocumentPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="SearchCatalogWrapped">
+      <soap:operation soapAction="urn:fixtures:legacy-rpc-encoded:SearchCatalogWrapped" />
+      <input><soap:body use="literal" /></input>
+      <output><soap:body use="literal" /></output>
+    </operation>
+  </binding>
+  <service name="LegacyRpcEncodedCatalogService">
+    <port name="LegacyCatalogRpcPort" binding="tns:LegacyCatalogRpcBinding">
+      <soap:address location="http://example.com/legacy-rpc-encoded/rpc" />
+    </port>
+    <port name="ModernCatalogDocumentPort" binding="tns:ModernCatalogDocumentBinding">
+      <soap:address location="http://example.com/legacy-rpc-encoded/document" />
+    </port>
+  </service>
+</definitions>

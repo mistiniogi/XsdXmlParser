@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="EmptyMessageService"
+    targetNamespace="urn:fixtures:empty-message-service"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="urn:fixtures:empty-message-service">
+  <message name="PingInput" />
+  <message name="PingOutput" />
+  <message name="ResetSessionInput" />
+  <message name="ResetSessionOutput" />
+  <portType name="EmptyMessagePortType">
+    <operation name="Ping">
+      <input message="tns:PingInput" />
+      <output message="tns:PingOutput" />
+    </operation>
+    <operation name="ResetSession">
+      <input message="tns:ResetSessionInput" />
+      <output message="tns:ResetSessionOutput" />
+    </operation>
+  </portType>
+  <binding name="EmptyMessageBinding" type="tns:EmptyMessagePortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="Ping">
+      <soap:operation soapAction="urn:fixtures:empty-message-service:Ping" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="ResetSession">
+      <soap:operation soapAction="urn:fixtures:empty-message-service:ResetSession" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="EmptyMessageService">
+    <port name="EmptyMessagePort" binding="tns:EmptyMessageBinding">
+      <soap:address location="http://example.com/empty-message-service" />
+    </port>
+  </service>
+</definitions>

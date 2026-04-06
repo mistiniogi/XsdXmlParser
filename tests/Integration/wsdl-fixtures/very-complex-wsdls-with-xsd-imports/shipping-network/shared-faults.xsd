@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema
+    targetNamespace="urn:fixtures:shipping-network:shared-faults"
+    elementFormDefault="qualified"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="ShippingFault">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="faultCode" type="xsd:string" />
+        <xsd:element name="faultMessage" type="xsd:string" />
+        <xsd:element name="retryable" type="xsd:boolean" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

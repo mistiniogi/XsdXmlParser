@@ -34,6 +34,8 @@ by the feature, make the smallest possible change that satisfies the requirement
 - C# 10.0 on .NET 6.0, .NET 7.0, and .NET 8.0 + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file (005-enhance-xml-docs)
 - N/A for this feature; the work is limited to source-file XML documentation comments in existing `.cs` files (005-enhance-xml-docs)
 - C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file (005-enhance-xml-docs)
+- C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` for the host repository; WSDL 1.1 and XSD fixture files only for this feature + Existing library dependencies remain unchanged: `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file (006-wsdl-test-assets)
+- Filesystem-backed test fixture assets under `tests/Integration/wsdl-fixtures` (006-wsdl-test-assets)
 
 ## Project Structure
 ```text
@@ -62,9 +64,9 @@ Before generating any new file or modifying an existing one for a speckit featur
 - [ ] No hardcoded strings — use constants or resource identifiers consistent with existing patterns
 
 ## Recent Changes
+- 006-wsdl-test-assets: Added C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` for the host repository; WSDL 1.1 and XSD fixture files only for this feature + Existing library dependencies remain unchanged: `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file
 - 005-enhance-xml-docs: Added C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file
 - 005-enhance-xml-docs: Added C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file
-- 005-enhance-xml-docs: Added C# 10.0 on .NET 6.0, .NET 7.0, and .NET 8.0 + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

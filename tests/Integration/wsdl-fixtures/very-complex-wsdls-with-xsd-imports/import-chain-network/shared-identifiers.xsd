@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema
+    targetNamespace="urn:fixtures:import-chain-network:schemas:identifiers"
+    elementFormDefault="qualified"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:simpleType name="PartnerIdentifierType">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="PT-[0-9]{6}" />
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="LineOfBusinessType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="retail" />
+      <xsd:enumeration value="distribution" />
+      <xsd:enumeration value="support" />
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="ImportChainBindings"
+    targetNamespace="urn:fixtures:import-chain-network:bindings"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:abs="urn:fixtures:import-chain-network:abstract"
+    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+    xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <import namespace="urn:fixtures:import-chain-network:abstract" location="abstract-contract.wsdl" />
+  <binding name="CustomerSoapBinding" type="abs:CustomerContractPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="ResolveCustomer">
+      <soap:operation soapAction="urn:fixtures:import-chain-network:ResolveCustomer" />
+      <input><soap:body use="literal" /></input>
+      <output><soap:body use="literal" /></output>
+    </operation>
+  </binding>
+  <binding name="CustomerHttpBinding" type="abs:CustomerContractPortType">
+    <http:binding verb="GET" />
+    <operation name="ResolveCustomer">
+      <http:operation location="/customer/resolve" />
+      <input><http:urlEncoded /></input>
+      <output><mime:mimeXml part="parameters" /></output>
+    </operation>
+  </binding>
+</definitions>

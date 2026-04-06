@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="EchoService"
+    targetNamespace="urn:fixtures:echo-service"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="urn:fixtures:echo-service"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <message name="EchoRequest">
+    <part name="message" type="xsd:string" />
+  </message>
+  <message name="EchoResponse">
+    <part name="message" type="xsd:string" />
+  </message>
+  <portType name="EchoPortType">
+    <operation name="Echo">
+      <input message="tns:EchoRequest" />
+      <output message="tns:EchoResponse" />
+    </operation>
+  </portType>
+  <binding name="EchoBinding" type="tns:EchoPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="Echo">
+      <soap:operation soapAction="urn:fixtures:echo-service:Echo" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="EchoService">
+    <port name="EchoPort" binding="tns:EchoBinding">
+      <soap:address location="http://example.com/echo-service" />
+    </port>
+  </service>
+</definitions>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="ImportChainServiceAggregator"
+    targetNamespace="urn:fixtures:import-chain-network:service"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:bnd="urn:fixtures:import-chain-network:bindings"
+    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <import namespace="urn:fixtures:import-chain-network:bindings" location="bindings.wsdl" />
+  <service name="ImportChainNetworkService">
+    <port name="CustomerSoapPort" binding="bnd:CustomerSoapBinding">
+      <soap:address location="http://example.com/import-chain-network/soap" />
+    </port>
+    <port name="CustomerHttpPort" binding="bnd:CustomerHttpBinding">
+      <http:address location="http://example.com/import-chain-network/http" />
+    </port>
+  </service>
+</definitions>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="DeepNestingLaboratoryService"
+    targetNamespace="urn:fixtures:deep-nesting-laboratory"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="urn:fixtures:deep-nesting-laboratory"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <documentation>
+    The intent of this fixture is to keep a large, noisy documentation surface around an otherwise valid service contract.
+    Maintainers should be able to verify that parser logic treats documentation as documentation and not as executable schema.
+    The text below is deliberately verbose and domain-shaped rather than XML-shaped.
+
+    Warehouse operators described the laboratory workflow in prose: first the intake team records an inbound specimen,
+    then the triage desk assigns a shelf code, then a validation worker cross-checks temperature annotations against the
+    manifest, and finally the archival subsystem emits a notification that human operators can ignore if the cargo never
+    left quarantine. None of this prose is meant to be interpreted as markup, code, or nested schema content.
+
+    Downstream parser tests may also use this file to ensure long text blocks do not interfere with line-oriented error
+    reporting, tokenization of QName references, namespace lookup, or operation enumeration when the documentation element
+    appears near the top of the contract and again inside operation-level descriptions.
+  </documentation>
+  <types>
+    <xsd:schema targetNamespace="urn:fixtures:deep-nesting-laboratory" elementFormDefault="qualified">
+      <xsd:element name="DeepInspectionRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="level01">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element name="level02">
+                    <xsd:complexType>
+                      <xsd:sequence>
+                        <xsd:element name="level03">
+                          <xsd:complexType>
+                            <xsd:sequence>
+                              <xsd:element name="level04">
+                                <xsd:complexType>
+                                  <xsd:sequence>
+                                    <xsd:element name="level05">
+                                      <xsd:complexType>
+                                        <xsd:sequence>
+                                          <xsd:element name="level06">
+                                            <xsd:complexType>
+                                              <xsd:sequence>
+                                                <xsd:element name="level07">
+                                                  <xsd:complexType>
+                                                    <xsd:sequence>
+                                                      <xsd:element name="level08">
+                                                        <xsd:complexType>
+                                                          <xsd:sequence>
+                                                            <xsd:element name="level09">
+                                                              <xsd:complexType>
+                                                                <xsd:sequence>
+                                                                  <xsd:element name="level10">
+                                                                    <xsd:complexType>
+                                                                      <xsd:sequence>
+                                                                        <xsd:element name="level11">
+                                                                          <xsd:complexType>
+                                                                            <xsd:sequence>
+                                                                              <xsd:element name="terminalValue" type="xsd:string" />
+                                                                            </xsd:sequence>
+                                                                          </xsd:complexType>
+                                                                        </xsd:element>
+                                                                      </xsd:sequence>
+                                                                    </xsd:complexType>
+                                                                  </xsd:element>
+                                                                </xsd:sequence>
+                                                              </xsd:complexType>
+                                                            </xsd:element>
+                                                          </xsd:sequence>
+                                                        </xsd:complexType>
+                                                      </xsd:element>
+                                                    </xsd:sequence>
+                                                  </xsd:complexType>
+                                                </xsd:element>
+                                              </xsd:sequence>
+                                            </xsd:complexType>
+                                          </xsd:element>
+                                        </xsd:sequence>
+                                      </xsd:complexType>
+                                    </xsd:element>
+                                  </xsd:sequence>
+                                </xsd:complexType>
+                              </xsd:element>
+                            </xsd:sequence>
+                          </xsd:complexType>
+                        </xsd:element>
+                      </xsd:sequence>
+                    </xsd:complexType>
+                  </xsd:element>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="DeepInspectionResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="accepted" type="xsd:boolean" />
+            <xsd:element name="depthConfirmed" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="DeepInspectionInput">
+    <part name="parameters" element="tns:DeepInspectionRequest" />
+  </message>
+  <message name="DeepInspectionOutput">
+    <part name="parameters" element="tns:DeepInspectionResponse" />
+  </message>
+  <portType name="DeepNestingLaboratoryPortType">
+    <operation name="SubmitDeepInspection">
+      <documentation>
+        The operation-level documentation remains intentionally verbose so line scanners can verify that prose blocks
+        between operation tags do not interfere with extraction of the input and output message references.
+      </documentation>
+      <input message="tns:DeepInspectionInput" />
+      <output message="tns:DeepInspectionOutput" />
+    </operation>
+  </portType>
+  <binding name="DeepNestingLaboratoryBinding" type="tns:DeepNestingLaboratoryPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="SubmitDeepInspection">
+      <soap:operation soapAction="urn:fixtures:deep-nesting-laboratory:SubmitDeepInspection" />
+      <input><soap:body use="literal" /></input>
+      <output><soap:body use="literal" /></output>
+    </operation>
+  </binding>
+  <service name="DeepNestingLaboratoryService">
+    <port name="DeepNestingLaboratoryPort" binding="tns:DeepNestingLaboratoryBinding">
+      <soap:address location="http://example.com/deep-nesting-laboratory" />
+    </port>
+  </service>
+</definitions>

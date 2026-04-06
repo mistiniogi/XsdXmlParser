@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema
+    targetNamespace="urn:fixtures:import-chain-network:schemas:main"
+    elementFormDefault="qualified"
+    xmlns:main="urn:fixtures:import-chain-network:schemas:main"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:complexType name="CommonRequestHeaderType">
+    <xsd:sequence>
+      <xsd:element name="requestId" type="xsd:string" />
+      <xsd:element name="requestedUtc" type="xsd:dateTime" />
+      <xsd:element name="sourceSystem" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="CommonResponseContextType">
+    <xsd:sequence>
+      <xsd:element name="responseId" type="xsd:string" />
+      <xsd:element name="servedBy" type="xsd:string" />
+      <xsd:element name="durationMs" type="xsd:int" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

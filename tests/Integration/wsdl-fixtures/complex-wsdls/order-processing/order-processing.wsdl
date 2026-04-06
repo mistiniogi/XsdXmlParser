@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="OrderProcessingService"
+    targetNamespace="urn:fixtures:order-processing"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="urn:fixtures:order-processing"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <xsd:schema targetNamespace="urn:fixtures:order-processing" elementFormDefault="qualified">
+      <xsd:complexType name="AddressType">
+        <xsd:sequence>
+          <xsd:element name="line1" type="xsd:string" />
+          <xsd:element name="city" type="xsd:string" />
+          <xsd:element name="postalCode" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="OrderItemType">
+        <xsd:sequence>
+          <xsd:element name="sku" type="xsd:string" />
+          <xsd:element name="quantity" type="xsd:int" />
+          <xsd:element name="unitPrice" type="xsd:decimal" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="OrderType">
+        <xsd:sequence>
+          <xsd:element name="orderId" type="xsd:string" />
+          <xsd:element name="shipTo" type="tns:AddressType" />
+          <xsd:element name="item" type="tns:OrderItemType" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="SubmitOrderRequest" type="tns:OrderType" />
+      <xsd:element name="SubmitOrderResponse"><xsd:complexType><xsd:sequence><xsd:element name="accepted" type="xsd:boolean" /><xsd:element name="trackingId" type="xsd:string" minOccurs="0" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="GetOrderStatusRequest"><xsd:complexType><xsd:sequence><xsd:element name="orderId" type="xsd:string" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="GetOrderStatusResponse"><xsd:complexType><xsd:sequence><xsd:element name="status" type="xsd:string" /><xsd:element name="lastUpdatedUtc" type="xsd:dateTime" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="CancelOrderRequest"><xsd:complexType><xsd:sequence><xsd:element name="orderId" type="xsd:string" /><xsd:element name="reason" type="xsd:string" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="CancelOrderResponse"><xsd:complexType><xsd:sequence><xsd:element name="cancelled" type="xsd:boolean" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="ListOrderEventsRequest"><xsd:complexType><xsd:sequence><xsd:element name="orderId" type="xsd:string" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="ListOrderEventsResponse"><xsd:complexType><xsd:sequence><xsd:element name="event" minOccurs="0" maxOccurs="unbounded"><xsd:complexType><xsd:sequence><xsd:element name="code" type="xsd:string" /><xsd:element name="occurredUtc" type="xsd:dateTime" /></xsd:sequence></xsd:complexType></xsd:element></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="AcknowledgeShipmentRequest"><xsd:complexType><xsd:sequence><xsd:element name="orderId" type="xsd:string" /><xsd:element name="receivedBy" type="xsd:string" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="AcknowledgeShipmentResponse"><xsd:complexType><xsd:sequence><xsd:element name="acknowledged" type="xsd:boolean" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="OrderFault"><xsd:complexType><xsd:sequence><xsd:element name="faultCode" type="xsd:string" /><xsd:element name="message" type="xsd:string" /></xsd:sequence></xsd:complexType></xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="SubmitOrderInput"><part name="parameters" element="tns:SubmitOrderRequest" /></message>
+  <message name="SubmitOrderOutput"><part name="parameters" element="tns:SubmitOrderResponse" /></message>
+  <message name="GetOrderStatusInput"><part name="parameters" element="tns:GetOrderStatusRequest" /></message>
+  <message name="GetOrderStatusOutput"><part name="parameters" element="tns:GetOrderStatusResponse" /></message>
+  <message name="CancelOrderInput"><part name="parameters" element="tns:CancelOrderRequest" /></message>
+  <message name="CancelOrderOutput"><part name="parameters" element="tns:CancelOrderResponse" /></message>
+  <message name="ListOrderEventsInput"><part name="parameters" element="tns:ListOrderEventsRequest" /></message>
+  <message name="ListOrderEventsOutput"><part name="parameters" element="tns:ListOrderEventsResponse" /></message>
+  <message name="AcknowledgeShipmentInput"><part name="parameters" element="tns:AcknowledgeShipmentRequest" /></message>
+  <message name="AcknowledgeShipmentOutput"><part name="parameters" element="tns:AcknowledgeShipmentResponse" /></message>
+  <message name="OrderFaultMessage"><part name="fault" element="tns:OrderFault" /></message>
+  <portType name="OrderProcessingPortType">
+    <operation name="SubmitOrder"><input message="tns:SubmitOrderInput" /><output message="tns:SubmitOrderOutput" /><fault name="OrderFault" message="tns:OrderFaultMessage" /></operation>
+    <operation name="GetOrderStatus"><input message="tns:GetOrderStatusInput" /><output message="tns:GetOrderStatusOutput" /></operation>
+    <operation name="CancelOrder"><input message="tns:CancelOrderInput" /><output message="tns:CancelOrderOutput" /><fault name="OrderFault" message="tns:OrderFaultMessage" /></operation>
+    <operation name="ListOrderEvents"><input message="tns:ListOrderEventsInput" /><output message="tns:ListOrderEventsOutput" /></operation>
+    <operation name="AcknowledgeShipment"><input message="tns:AcknowledgeShipmentInput" /><output message="tns:AcknowledgeShipmentOutput" /></operation>
+  </portType>
+  <binding name="OrderProcessingBinding" type="tns:OrderProcessingPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="SubmitOrder"><soap:operation soapAction="urn:fixtures:order-processing:SubmitOrder" /><input><soap:body use="literal" /></input><output><soap:body use="literal" /></output><fault name="OrderFault"><soap:fault name="OrderFault" use="literal" /></fault></operation>
+    <operation name="GetOrderStatus"><soap:operation soapAction="urn:fixtures:order-processing:GetOrderStatus" /><input><soap:body use="literal" /></input><output><soap:body use="literal" /></output></operation>
+    <operation name="CancelOrder"><soap:operation soapAction="urn:fixtures:order-processing:CancelOrder" /><input><soap:body use="literal" /></input><output><soap:body use="literal" /></output><fault name="OrderFault"><soap:fault name="OrderFault" use="literal" /></fault></operation>
+    <operation name="ListOrderEvents"><soap:operation soapAction="urn:fixtures:order-processing:ListOrderEvents" /><input><soap:body use="literal" /></input><output><soap:body use="literal" /></output></operation>
+    <operation name="AcknowledgeShipment"><soap:operation soapAction="urn:fixtures:order-processing:AcknowledgeShipment" /><input><soap:body use="literal" /></input><output><soap:body use="literal" /></output></operation>
+  </binding>
+  <service name="OrderProcessingService">
+    <port name="OrderProcessingPort" binding="tns:OrderProcessingBinding">
+      <soap:address location="http://example.com/order-processing" />
+    </port>
+  </service>
+</definitions>

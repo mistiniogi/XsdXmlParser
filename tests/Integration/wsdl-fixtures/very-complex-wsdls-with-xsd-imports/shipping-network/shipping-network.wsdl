@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="ShippingNetworkService"
+    targetNamespace="urn:fixtures:shipping-network"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="urn:fixtures:shipping-network"
+    xmlns:ship="urn:fixtures:shipping-network:order-types"
+    xmlns:faults="urn:fixtures:shipping-network:shared-faults"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <xsd:schema targetNamespace="urn:fixtures:shipping-network" elementFormDefault="qualified">
+      <xsd:import namespace="urn:fixtures:shipping-network:order-types" schemaLocation="order-types.xsd" />
+      <xsd:import namespace="urn:fixtures:shipping-network:shared-faults" schemaLocation="shared-faults.xsd" />
+      <xsd:element name="CreateRouteRequest" type="ship:ShipmentPlanType" />
+      <xsd:element name="CreateRouteResponse"><xsd:complexType><xsd:sequence><xsd:element name="routeId" type="xsd:string" /><xsd:element name="assignedCarrier" type="xsd:string" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="TrackConsignmentRequest"><xsd:complexType><xsd:sequence><xsd:element name="trackingId" type="xsd:string" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="TrackConsignmentResponse"><xsd:complexType><xsd:sequence><xsd:element name="status" type="xsd:string" /><xsd:element name="lastCheckpointUtc" type="xsd:dateTime" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="AllocateDockRequest"><xsd:complexType><xsd:sequence><xsd:element name="warehouseId" type="xsd:string" /><xsd:element name="dockCode" type="xsd:string" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="AllocateDockResponse"><xsd:complexType><xsd:sequence><xsd:element name="allocationId" type="xsd:string" /></xsd:sequence></xsd:complexType></xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="CreateRouteInput"><part name="parameters" element="tns:CreateRouteRequest" /></message>
+  <message name="CreateRouteOutput"><part name="parameters" element="tns:CreateRouteResponse" /></message>
+  <message name="TrackConsignmentInput"><part name="parameters" element="tns:TrackConsignmentRequest" /></message>
+  <message name="TrackConsignmentOutput"><part name="parameters" element="tns:TrackConsignmentResponse" /></message>
+  <message name="AllocateDockInput"><part name="parameters" element="tns:AllocateDockRequest" /></message>
+  <message name="AllocateDockOutput"><part name="parameters" element="tns:AllocateDockResponse" /></message>
+  <message name="ShippingFaultMessage"><part name="fault" element="faults:ShippingFault" /></message>
+  <portType name="ShippingNetworkPortType">
+    <operation name="CreateRoute"><input message="tns:CreateRouteInput" /><output message="tns:CreateRouteOutput" /><fault name="ShippingFault" message="tns:ShippingFaultMessage" /></operation>
+    <operation name="TrackConsignment"><input message="tns:TrackConsignmentInput" /><output message="tns:TrackConsignmentOutput" /></operation>
+    <operation name="AllocateDock"><input message="tns:AllocateDockInput" /><output message="tns:AllocateDockOutput" /><fault name="ShippingFault" message="tns:ShippingFaultMessage" /></operation>
+  </portType>
+  <binding name="ShippingNetworkBinding" type="tns:ShippingNetworkPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="CreateRoute"><soap:operation soapAction="urn:fixtures:shipping-network:CreateRoute" /><input><soap:body use="literal" /></input><output><soap:body use="literal" /></output><fault name="ShippingFault"><soap:fault name="ShippingFault" use="literal" /></fault></operation>
+    <operation name="TrackConsignment"><soap:operation soapAction="urn:fixtures:shipping-network:TrackConsignment" /><input><soap:body use="literal" /></input><output><soap:body use="literal" /></output></operation>
+    <operation name="AllocateDock"><soap:operation soapAction="urn:fixtures:shipping-network:AllocateDock" /><input><soap:body use="literal" /></input><output><soap:body use="literal" /></output><fault name="ShippingFault"><soap:fault name="ShippingFault" use="literal" /></fault></operation>
+  </binding>
+  <service name="ShippingNetworkService">
+    <port name="ShippingNetworkPort" binding="tns:ShippingNetworkBinding">
+      <soap:address location="http://example.com/shipping-network" />
+    </port>
+  </service>
+</definitions>

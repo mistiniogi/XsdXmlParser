@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema
+    targetNamespace="urn:fixtures:shipping-network:order-types"
+    elementFormDefault="qualified"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="urn:fixtures:shipping-network:order-types">
+  <xsd:complexType name="PackageType">
+    <xsd:sequence>
+      <xsd:element name="packageId" type="xsd:string" />
+      <xsd:element name="weightKg" type="xsd:decimal" />
+      <xsd:element name="contentsCode" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="ShipmentPlanType">
+    <xsd:sequence>
+      <xsd:element name="planId" type="xsd:string" />
+      <xsd:element name="originRegion" type="xsd:string" />
+      <xsd:element name="destinationRegion" type="xsd:string" />
+      <xsd:element name="package" type="tns:PackageType" minOccurs="1" maxOccurs="unbounded" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>
