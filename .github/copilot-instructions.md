@@ -20,7 +20,7 @@ by the feature, make the smallest possible change that satisfies the requirement
   inline comment so it is visible in review and traceable to the feature plan.
 4. **Match existing naming conventions** — Follow the exact same naming patterns (PascalCase for types/members, camelCase for locals/parameters, `I` prefix for interfaces, `Base` suffix for abstract classes where applicable).
 5. **Keep multi-target compatibility** — All new shared production code must compile and run correctly on .NET 6.0, .NET 7.0, and .NET 8.0. Do not use APIs or language features exclusive to a single target.
-6. **Maintain XML documentation** — Every new class, interface, struct, enum, method, property, constructor, delegate, and event in shared production code must include `<summary>`, `<param>`, `<returns>`, and `<value>` XML doc tags where applicable.
+6. **Maintain XML documentation** — Every new declaration in shared production code, regardless of visibility, must include XML documentation comments with `<summary>` and all other applicable tags such as `<param>`, `<typeparam>`, `<returns>`, `<value>`, `<remarks>`, `<exception>`, `<example>`, `<paramref>`, `<typeparamref>`, `<see>`, and `<seealso>`. Preserve accurate existing intent when enhancing comments.
 7. **Do not remove inline Why comments** — Preserve all existing inline comments explaining non-obvious logic (XSD traversal, canonicalization, cycle handling). Add equivalent comments to any new complex logic.
 
 ## Active Technologies
@@ -46,7 +46,7 @@ tests/
 
 ## Code Style
 - C# 10.0 across shared code: follow standard conventions and avoid newer language features in shared production files
-- All C# classes, structs, enums, interfaces, properties, methods, constructors, delegates, events, and other shared production declarations must include XML documentation tags (`<summary>`, `<param>`, `<returns>`, `<value>` where applicable)
+- All C# declarations in shared production code, regardless of visibility, must include XML documentation comments with the applicable XML tag set (`<summary>`, `<param>`, `<typeparam>`, `<returns>`, `<value>`, `<remarks>`, `<exception>`, `<example>`, `<paramref>`, `<typeparamref>`, `<see>`, and `<seealso>` where relevant)
 - Complex logic such as XSD traversal, canonicalization, and cycle handling should include succinct inline Why comments when intent is not obvious from the code
 
 ## New Feature Checklist (Copilot must verify before generating code)
