@@ -17,6 +17,9 @@ public sealed class RefIdFactory
     /// <param name="schemaPath">The normalized schema path.</param>
     /// <param name="localOrdinal">The zero-based ordinal within the parent scope.</param>
     /// <returns>The deterministic anonymous-type reference identifier.</returns>
+    /// <remarks>
+    /// Anonymous identifiers incorporate source, parent scope, schema path, and ordinal so repeated builds produce stable reference identifiers.
+    /// </remarks>
     public string CreateAnonymousTypeRefId(string sourceId, string parentRefId, string schemaPath, int localOrdinal)
     {
         var material = string.Create(

@@ -12,6 +12,9 @@ namespace XsdXmlParser.Core.Parsing;
 /// </summary>
 internal sealed class ParsedItemHandlerDispatcher
 {
+    /// <summary>
+    /// The ordered handler set used to translate discovered XML items into normalized graph state.
+    /// </summary>
     private readonly IReadOnlyList<IParsedItemHandler> handlers;
 
     /// <summary>
@@ -60,6 +63,9 @@ internal sealed class ParsedItemHandlerDispatcher
     /// <param name="localOrdinal">The zero-based ordinal within the parent scope.</param>
     /// <param name="cancellationToken">The cancellation token for the operation.</param>
     /// <returns>A task that returns the canonical reference identifier when one is produced.</returns>
+    /// <remarks>
+    /// The dispatcher preserves handler ordering so more specific handlers can run before broader item categories.
+    /// </remarks>
     public Task<string?> HandleAsync(ParsedItemContext context, XElement item, string? parentRefId, int localOrdinal, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

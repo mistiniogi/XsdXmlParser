@@ -13,6 +13,9 @@ public sealed class GraphLinkingService
     /// <param name="graph">The graph to link.</param>
     /// <param name="cancellationToken">The cancellation token for the operation.</param>
     /// <returns>A task that returns the linked graph.</returns>
+    /// <remarks>
+    /// The current implementation preserves the discovered graph unchanged while reserving a stable extension point for future Pass 2 linkage behavior.
+    /// </remarks>
     public static Task<MetadataGraphModel> LinkAsync(MetadataGraphModel graph, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

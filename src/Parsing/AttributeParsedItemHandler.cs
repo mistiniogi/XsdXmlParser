@@ -8,7 +8,7 @@ using XsdXmlParser.Core.Models;
 namespace XsdXmlParser.Core.Parsing;
 
 /// <summary>
-/// Handles attribute schema items.
+/// Handles XSD attribute items and projects them into canonical attribute entries.
 /// </summary>
 internal sealed class AttributeParsedItemHandler : IParsedItemHandler
 {

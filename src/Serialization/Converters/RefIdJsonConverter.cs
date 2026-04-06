@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace XsdXmlParser.Core.Serialization.Converters;
 
 /// <summary>
-/// Serializes string-based reference identifiers as JSON string values.
+/// Serializes string-based reference identifiers as JSON string values so canonical graph references remain stable in serialized output.
 /// </summary>
 public sealed class RefIdJsonConverter : JsonConverter<string>
 {

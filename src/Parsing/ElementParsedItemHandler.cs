@@ -8,7 +8,7 @@ using XsdXmlParser.Core.Models;
 namespace XsdXmlParser.Core.Parsing;
 
 /// <summary>
-/// Handles element schema items.
+/// Handles XSD element items and projects them into canonical element, relationship, and occurrence metadata.
 /// </summary>
 internal sealed class ElementParsedItemHandler : IParsedItemHandler
 {
@@ -104,6 +104,14 @@ internal sealed class ElementParsedItemHandler : IParsedItemHandler
         return refId;
     }
 
+    /// <summary>
+    /// Adds a parent-child relationship when the current element is nested inside another registered entry.
+    /// </summary>
+    /// <param name="context">The current parsing context.</param>
+    /// <param name="parentRefId">The optional parent reference identifier.</param>
+    /// <param name="childRefId">The child reference identifier.</param>
+    /// <param name="localOrdinal">The zero-based ordinal within the parent scope.</param>
+    /// <param name="relationshipKind">The relationship kind to store.</param>
     private static void AddParentRelationship(ParsedItemContext context, string? parentRefId, string childRefId, int localOrdinal, ERelationshipKind relationshipKind)
     {
         if (string.IsNullOrWhiteSpace(parentRefId))
@@ -122,6 +130,12 @@ internal sealed class ElementParsedItemHandler : IParsedItemHandler
         });
     }
 
+    /// <summary>
+    /// Parses an occurrence value while falling back to the supplied default.
+    /// </summary>
+    /// <param name="value">The raw occurrence value.</param>
+    /// <param name="defaultValue">The default value to use when parsing fails.</param>
+    /// <returns>The parsed occurrence value or the supplied default.</returns>
     private static int ParseInt(string? value, int defaultValue)
     {
         return int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedValue)

@@ -4,13 +4,28 @@ using XsdXmlParser.Core.Models;
 namespace XsdXmlParser.Core.Parsing;
 
 /// <summary>
-/// Provides async WSDL parse entry points for file-backed and string-backed inputs.
+/// Provides asynchronous WSDL parse entry points for file-backed and string-backed inputs.
 /// </summary>
 public sealed class WsdlParserService : IWsdlParser
 {
+    /// <summary>
+    /// The compatibility graph builder used when the parser operates without the orchestration service.
+    /// </summary>
     private readonly IMetadataGraphBuilder? metadataGraphBuilder;
+
+    /// <summary>
+    /// The preferred orchestration service used by the primary request-model workflow.
+    /// </summary>
     private readonly IParserOrchestrationService? parserOrchestrationService;
+
+    /// <summary>
+    /// The compatibility source loader used when the parser operates without the orchestration service.
+    /// </summary>
     private readonly ISourceLoader? sourceLoader;
+
+    /// <summary>
+    /// The compatibility WSDL discovery service used when the parser operates without the orchestration service.
+    /// </summary>
     private readonly WsdlDiscoveryService? wsdlDiscoveryService;
 
     /// <summary>

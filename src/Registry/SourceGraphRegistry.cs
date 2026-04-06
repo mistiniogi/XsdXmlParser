@@ -8,8 +8,19 @@ namespace XsdXmlParser.Core.Registry;
 /// </summary>
 public sealed class SourceGraphRegistry
 {
+    /// <summary>
+    /// The registered source descriptors keyed by canonical source identifier.
+    /// </summary>
     private readonly Dictionary<string, SourceDescriptorModel> descriptors = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// The registered source descriptors keyed by normalized virtual path.
+    /// </summary>
     private readonly Dictionary<string, SourceDescriptorModel> descriptorsByVirtualPath = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// The source identifiers that are currently being resolved.
+    /// </summary>
     private readonly HashSet<string> resolvingSources = new(StringComparer.Ordinal);
 
     /// <summary>

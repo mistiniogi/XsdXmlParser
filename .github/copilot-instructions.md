@@ -31,6 +31,9 @@ by the feature, make the smallest possible change that satisfies the requirement
 - In-memory source descriptors, centralized registry services, and normalized metadata graph dictionaries (003-complete-async-parser)
 - C# 10.0 on .NET 6.0, .NET 7.0, and .NET 8.0 + `System.Xml`, `System.Text`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions` (004-simplify-source-loading)
 - In-memory source descriptors, virtual file metadata, centralized registry services, and normalized metadata graph dictionaries (004-simplify-source-loading)
+- C# 10.0 on .NET 6.0, .NET 7.0, and .NET 8.0 + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file (005-enhance-xml-docs)
+- N/A for this feature; the work is limited to source-file XML documentation comments in existing `.cs` files (005-enhance-xml-docs)
+- C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file (005-enhance-xml-docs)
 
 ## Project Structure
 ```text
@@ -59,9 +62,9 @@ Before generating any new file or modifying an existing one for a speckit featur
 - [ ] No hardcoded strings — use constants or resource identifiers consistent with existing patterns
 
 ## Recent Changes
-- 004-simplify-source-loading: Added C# 10.0 on .NET 6.0, .NET 7.0, and .NET 8.0 + `System.Xml`, `System.Text`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`
-- 004-simplify-source-loading: Added C# 10.0 on .NET 6.0, .NET 7.0, and .NET 8.0 + `System.Xml`, `System.Text`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`
-- 003-complete-async-parser: Added C# 10.0 on .NET 6.0, .NET 7.0, and .NET 8.0 + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`
+- 005-enhance-xml-docs: Added C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file
+- 005-enhance-xml-docs: Added C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file
+- 005-enhance-xml-docs: Added C# 10.0 on .NET 6.0, .NET 7.0, and .NET 8.0 + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

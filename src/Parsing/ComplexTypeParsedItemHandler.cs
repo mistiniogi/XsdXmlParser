@@ -7,7 +7,7 @@ using XsdXmlParser.Core.Models;
 namespace XsdXmlParser.Core.Parsing;
 
 /// <summary>
-/// Handles complex type schema items.
+/// Handles XSD complex type items and projects them into canonical type, relationship, and member metadata.
 /// </summary>
 internal sealed class ComplexTypeParsedItemHandler : IParsedItemHandler
 {

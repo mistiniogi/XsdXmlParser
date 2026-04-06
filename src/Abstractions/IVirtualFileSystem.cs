@@ -5,7 +5,7 @@ using XsdXmlParser.Core.Models;
 namespace XsdXmlParser.Core.Abstractions;
 
 /// <summary>
-/// Provides a virtualized source-access layer for file-backed and memory-backed schema content.
+/// Provides a virtualized source-access layer for file-backed, memory-backed, and stream-backed schema content.
 /// </summary>
 public interface IVirtualFileSystem
 {
@@ -56,6 +56,6 @@ public interface IVirtualFileSystem
     /// </summary>
     /// <param name="basePath">The base logical path.</param>
     /// <param name="relativePath">The relative path to resolve.</param>
-    /// <returns>The normalized resolved path.</returns>
+    /// <returns>The normalized resolved path used for import and include resolution.</returns>
     string ResolveRelativePath(string basePath, string relativePath);
 }

@@ -11,31 +11,37 @@ public sealed class TypeRegistry
     /// <summary>
     /// Gets the complex type dictionary.
     /// </summary>
+    /// <value>The canonical complex type dictionary keyed by reference identifier.</value>
     public Dictionary<string, ComplexTypeModel> ComplexTypes { get; } = new(StringComparer.Ordinal);
 
     /// <summary>
     /// Gets the simple type dictionary.
     /// </summary>
+    /// <value>The canonical simple type dictionary keyed by reference identifier.</value>
     public Dictionary<string, SimpleTypeModel> SimpleTypes { get; } = new(StringComparer.Ordinal);
 
     /// <summary>
     /// Gets the element dictionary.
     /// </summary>
+    /// <value>The canonical element dictionary keyed by reference identifier.</value>
     public Dictionary<string, ElementModel> Elements { get; } = new(StringComparer.Ordinal);
 
     /// <summary>
     /// Gets the attribute dictionary.
     /// </summary>
+    /// <value>The canonical attribute dictionary keyed by reference identifier.</value>
     public Dictionary<string, AttributeModel> Attributes { get; } = new(StringComparer.Ordinal);
 
     /// <summary>
     /// Gets the validation rule dictionary.
     /// </summary>
+    /// <value>The normalized validation rule dictionary keyed by rule identifier.</value>
     public Dictionary<string, ConstraintSetModel> ValidationRules { get; } = new(StringComparer.Ordinal);
 
     /// <summary>
     /// Gets the relationship dictionary.
     /// </summary>
+    /// <value>The normalized relationship dictionary keyed by relationship identifier.</value>
     public Dictionary<string, RelationshipModel> Relationships { get; } = new(StringComparer.Ordinal);
 
     /// <summary>

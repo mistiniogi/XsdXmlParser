@@ -7,6 +7,9 @@ namespace XsdXmlParser.Core.Parsing;
 /// </summary>
 public sealed class ImportResolutionService
 {
+    /// <summary>
+    /// The virtual file system used to normalize relative source paths.
+    /// </summary>
     private readonly IVirtualFileSystem virtualFileSystem;
 
     /// <summary>
@@ -24,6 +27,9 @@ public sealed class ImportResolutionService
     /// <param name="basePath">The base logical path.</param>
     /// <param name="relativePath">The relative path to resolve.</param>
     /// <returns>The normalized resolved path.</returns>
+    /// <remarks>
+    /// Centralizing path resolution keeps cycle detection, duplicate analysis, and diagnostics aligned on the same canonical path form.
+    /// </remarks>
     public string Resolve(string basePath, string relativePath)
     {
         // Why: path normalization must be centralized so cycle detection and diagnostics

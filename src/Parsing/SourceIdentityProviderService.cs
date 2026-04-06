@@ -4,11 +4,14 @@ using XsdXmlParser.Core.Models;
 namespace XsdXmlParser.Core.Parsing;
 
 /// <summary>
-/// Validates and assigns logical source identities.
+/// Validates and assigns logical source identities for normalized parser sources.
 /// </summary>
 public sealed class SourceIdentityProviderService : ISourceIdentityProvider
 {
     /// <inheritdoc/>
+    /// <remarks>
+    /// Identity validation is performed before discovery and graph-building work begins so duplicate logical inputs cannot collide in registry state.
+    /// </remarks>
     public string GetOrCreateIdentity(SourceDescriptorModel descriptor)
     {
         ArgumentNullException.ThrowIfNull(descriptor);
