@@ -13,7 +13,7 @@ namespace XsdXmlParser.Core.Extensions;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds the default XSD/WSDL parser services to the service collection.
+    /// Adds the default XSD/WSDL parser services to the service collection for the retained file and string workflows.
     /// </summary>
     /// <param name="services">The service collection to update.</param>
     /// <returns>The updated service collection.</returns>
@@ -45,8 +45,10 @@ public static class ServiceCollectionExtensions
             .AddScoped<ImportResolutionService>()
             .AddScoped<GraphLinkingService>()
             .AddScoped<WsdlDiscoveryService>()
-            .AddScoped<IXsdParser, XsdParserService>()
-            .AddScoped<IWsdlParser, WsdlParserService>()
+            .AddScoped<IXsdParser>(serviceProvider => new XsdParserService(
+                serviceProvider.GetRequiredService<IParserOrchestrationService>()))
+            .AddScoped<IWsdlParser>(serviceProvider => new WsdlParserService(
+                serviceProvider.GetRequiredService<IParserOrchestrationService>()))
             .AddSingleton<IMetadataGraphSerializer, MetadataGraphJsonSerializer>();
     }
 }

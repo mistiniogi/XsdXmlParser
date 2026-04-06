@@ -4,7 +4,7 @@ using XsdXmlParser.Core.Models;
 namespace XsdXmlParser.Core.Parsing;
 
 /// <summary>
-/// Provides async XSD parse entry points for supported input types.
+/// Provides async XSD parse entry points for file-backed and string-backed inputs.
 /// </summary>
 public sealed class XsdParserService : IXsdParser
 {
@@ -33,20 +33,6 @@ public sealed class XsdParserService : IXsdParser
     }
 
     /// <inheritdoc/>
-    public async Task<MetadataGraphModel> ParseBatchAsync(IEnumerable<BatchSourceRequestModel> sources, CancellationToken cancellationToken)
-    {
-        if (parserOrchestrationService is not null)
-        {
-            return await parserOrchestrationService.ParseBatchAsync(new BatchParseRequestModel { Sources = sources.ToArray() }, cancellationToken).ConfigureAwait(false);
-        }
-
-        var localSourceLoader = sourceLoader ?? throw new InvalidOperationException("The source loader is not available for compatibility parsing.");
-        var localMetadataGraphBuilder = metadataGraphBuilder ?? throw new InvalidOperationException("The metadata graph builder is not available for compatibility parsing.");
-        var descriptors = await localSourceLoader.LoadBatchAsync(sources, cancellationToken).ConfigureAwait(false);
-        return await localMetadataGraphBuilder.BuildAsync(descriptors, cancellationToken).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc/>
     public async Task<MetadataGraphModel> ParseFromFileAsync(string filePath, CancellationToken cancellationToken)
     {
         if (parserOrchestrationService is not null)
@@ -64,51 +50,45 @@ public sealed class XsdParserService : IXsdParser
 
         var localSourceLoader = sourceLoader ?? throw new InvalidOperationException("The source loader is not available for compatibility parsing.");
         var localMetadataGraphBuilder = metadataGraphBuilder ?? throw new InvalidOperationException("The metadata graph builder is not available for compatibility parsing.");
-        var descriptor = await localSourceLoader.LoadFromFileAsync(filePath, cancellationToken).ConfigureAwait(false);
+        var descriptor = await localSourceLoader.LoadAsync(
+            new FilePathParseRequestModel
+            {
+                DisplayName = Path.GetFileName(filePath),
+                DocumentKind = ESchemaDocumentKind.Xsd,
+                FilePath = filePath,
+                LogicalPath = filePath,
+            },
+            cancellationToken).ConfigureAwait(false);
         return await localMetadataGraphBuilder.BuildAsync(new[] { descriptor }, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task<MetadataGraphModel> ParseFromMemoryAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken)
+    public async Task<MetadataGraphModel> ParseFromStringAsync(string content, string logicalPath, CancellationToken cancellationToken)
     {
         if (parserOrchestrationService is not null)
         {
-            return await parserOrchestrationService.ParseMemoryAsync(
-                new MemoryParseRequestModel
+            return await parserOrchestrationService.ParseStringAsync(
+                new StringParseRequestModel
                 {
-                    Buffer = buffer,
-                    DisplayName = "memory-source.xsd",
+                    Content = content,
+                    DisplayName = Path.GetFileName(logicalPath),
                     DocumentKind = ESchemaDocumentKind.Xsd,
-                    LogicalPath = "memory-source.xsd",
+                    LogicalPath = logicalPath,
                 },
                 cancellationToken).ConfigureAwait(false);
         }
 
         var localSourceLoader = sourceLoader ?? throw new InvalidOperationException("The source loader is not available for compatibility parsing.");
         var localMetadataGraphBuilder = metadataGraphBuilder ?? throw new InvalidOperationException("The metadata graph builder is not available for compatibility parsing.");
-        var descriptor = await localSourceLoader.LoadFromMemoryAsync("memory-source", "memory-source", buffer, cancellationToken).ConfigureAwait(false);
-        return await localMetadataGraphBuilder.BuildAsync(new[] { descriptor }, cancellationToken).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc/>
-    public async Task<MetadataGraphModel> ParseFromStreamAsync(Stream stream, CancellationToken cancellationToken)
-    {
-        if (parserOrchestrationService is not null)
-        {
-            return await parserOrchestrationService.ParseStreamAsync(
-                new StreamParseRequestModel
-                {
-                    Content = stream,
-                    DisplayName = "stream-source.xsd",
-                    DocumentKind = ESchemaDocumentKind.Xsd,
-                    LogicalPath = "stream-source.xsd",
-                },
-                cancellationToken).ConfigureAwait(false);
-        }
-
-        var localSourceLoader = sourceLoader ?? throw new InvalidOperationException("The source loader is not available for compatibility parsing.");
-        var localMetadataGraphBuilder = metadataGraphBuilder ?? throw new InvalidOperationException("The metadata graph builder is not available for compatibility parsing.");
-        var descriptor = await localSourceLoader.LoadFromStreamAsync("stream-source", "stream-source", stream, cancellationToken).ConfigureAwait(false);
+        var descriptor = await localSourceLoader.LoadAsync(
+            new StringParseRequestModel
+            {
+                Content = content,
+                DisplayName = Path.GetFileName(logicalPath),
+                DocumentKind = ESchemaDocumentKind.Xsd,
+                LogicalPath = logicalPath,
+            },
+            cancellationToken).ConfigureAwait(false);
         return await localMetadataGraphBuilder.BuildAsync(new[] { descriptor }, cancellationToken).ConfigureAwait(false);
     }
 }

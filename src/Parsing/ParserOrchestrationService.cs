@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using XsdXmlParser.Core.Abstractions;
 using XsdXmlParser.Core.Models;
@@ -27,13 +28,6 @@ public sealed class ParserOrchestrationService : IParserOrchestrationService
     }
 
     /// <inheritdoc/>
-    public Task<MetadataGraphModel> ParseBatchAsync(BatchParseRequestModel request, CancellationToken cancellationToken)
-    {
-        ArgumentNullException.ThrowIfNull(request);
-        return ExecuteAsync(() => sourceLoader.LoadAsync(request, cancellationToken), cancellationToken);
-    }
-
-    /// <inheritdoc/>
     public Task<MetadataGraphModel> ParseFileAsync(FilePathParseRequestModel request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -41,14 +35,7 @@ public sealed class ParserOrchestrationService : IParserOrchestrationService
     }
 
     /// <inheritdoc/>
-    public Task<MetadataGraphModel> ParseMemoryAsync(MemoryParseRequestModel request, CancellationToken cancellationToken)
-    {
-        ArgumentNullException.ThrowIfNull(request);
-        return ExecuteAsync(async () => new[] { await sourceLoader.LoadAsync(request, cancellationToken).ConfigureAwait(false) }, cancellationToken);
-    }
-
-    /// <inheritdoc/>
-    public Task<MetadataGraphModel> ParseStreamAsync(StreamParseRequestModel request, CancellationToken cancellationToken)
+    public Task<MetadataGraphModel> ParseStringAsync(StringParseRequestModel request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         return ExecuteAsync(async () => new[] { await sourceLoader.LoadAsync(request, cancellationToken).ConfigureAwait(false) }, cancellationToken);
@@ -85,6 +72,8 @@ public sealed class ParserOrchestrationService : IParserOrchestrationService
                 ? await wsdlDiscoveryService.DiscoverAsync(descriptors, cancellationToken).ConfigureAwait(false)
                 : descriptors;
 
+            // Why: source normalization ends here and the registry-backed graph builder owns all
+            // downstream source registration, discovery tracking, and canonical graph assembly.
             return await metadataGraphBuilder.BuildAsync(discoveredDescriptors, cancellationToken).ConfigureAwait(false);
         }
         catch (ParseFailureException)

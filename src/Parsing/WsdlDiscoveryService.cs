@@ -100,7 +100,7 @@ public sealed class WsdlDiscoveryService
             IsMainSource = false,
             LogicalName = Path.GetFileName(resolvedPath),
             RelativePath = resolvedPath,
-            SourceKind = Path.IsPathRooted(resolvedPath) ? ESourceKind.FilePath : ESourceKind.BatchStream,
+            SourceKind = Path.IsPathRooted(resolvedPath) ? ESourceKind.FilePath : ESourceKind.StringContent,
             VirtualPath = resolvedPath,
         };
 

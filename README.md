@@ -24,9 +24,7 @@ var parser = serviceProvider.GetRequiredService<IParserOrchestrationService>();
 ## Supported Request Shapes
 
 - `FilePathParseRequestModel`
-- `StreamParseRequestModel`
-- `MemoryParseRequestModel`
-- `BatchParseRequestModel`
+- `StringParseRequestModel`
 
 Every request must declare `DocumentKind` explicitly as `ESchemaDocumentKind.Wsdl` or `ESchemaDocumentKind.Xsd`.
 
@@ -44,15 +42,18 @@ var graph = await parser.ParseFileAsync(
 	cancellationToken);
 ```
 
-## Parse An XSD Stream
+## Parse An XSD String
 
 ```csharp
-await using var stream = File.OpenRead("schemas/types.xsd");
+const string schemaText =
+	"<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">" +
+	"<xs:element name=\"customer\" type=\"xs:string\" />" +
+	"</xs:schema>";
 
-var graph = await parser.ParseStreamAsync(
-	new StreamParseRequestModel
+var graph = await parser.ParseStringAsync(
+	new StringParseRequestModel
 	{
-		Content = stream,
+		Content = schemaText,
 		DisplayName = "types.xsd",
 		LogicalPath = "schemas/types.xsd",
 		DocumentKind = ESchemaDocumentKind.Xsd,
@@ -60,32 +61,11 @@ var graph = await parser.ParseStreamAsync(
 	cancellationToken);
 ```
 
-## Parse A Batch
+## Use Typed Parser Adapters
 
 ```csharp
-var graph = await parser.ParseBatchAsync(
-	new BatchParseRequestModel
-	{
-		Sources = new[]
-		{
-			new BatchSourceRequestModel
-			{
-				LogicalName = "main.wsdl",
-				LogicalPath = "schemas/main.wsdl",
-				Content = File.OpenRead("schemas/main.wsdl"),
-				DocumentKind = ESchemaDocumentKind.Wsdl,
-				IsMain = true,
-			},
-			new BatchSourceRequestModel
-			{
-				LogicalName = "types.xsd",
-				LogicalPath = "schemas/types.xsd",
-				Content = File.OpenRead("schemas/types.xsd"),
-				DocumentKind = ESchemaDocumentKind.Xsd,
-			},
-		},
-	},
-	cancellationToken);
+var xsdParser = serviceProvider.GetRequiredService<IXsdParser>();
+var graph = await xsdParser.ParseFromStringAsync(schemaText, "schemas/types.xsd", cancellationToken);
 ```
 
 ## Failure Contract

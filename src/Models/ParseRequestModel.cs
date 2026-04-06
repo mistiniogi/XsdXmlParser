@@ -6,7 +6,7 @@ namespace XsdXmlParser.Core.Models;
 public abstract class ParseRequestModel
 {
     /// <summary>
-    /// Gets or sets the caller-declared document kind.
+    /// Gets or sets the caller-declared document kind for the primary request-model workflow.
     /// </summary>
     public ESchemaDocumentKind DocumentKind { get; set; }
 
@@ -16,7 +16,11 @@ public abstract class ParseRequestModel
     public string? DisplayName { get; set; }
 
     /// <summary>
-    /// Gets or sets the optional logical path used for resolution.
+    /// Gets or sets the logical path used for resolution.
     /// </summary>
+    /// <value>
+    /// The file-backed request may omit this value to fall back to the physical file path, while
+    /// string-backed requests must provide it so relative references can resolve consistently.
+    /// </value>
     public string? LogicalPath { get; set; }
 }

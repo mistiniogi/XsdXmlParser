@@ -11,17 +11,7 @@ public enum ESourceKind
     FilePath,
 
     /// <summary>
-    /// The source originated from a stream.
+    /// The source originated from a string-backed request.
     /// </summary>
-    Stream,
-
-    /// <summary>
-    /// The source originated from a memory buffer.
-    /// </summary>
-    Memory,
-
-    /// <summary>
-    /// The source originated from a batch stream request.
-    /// </summary>
-    BatchStream,
+    StringContent,
 }

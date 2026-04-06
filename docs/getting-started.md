@@ -15,11 +15,9 @@ var parser = serviceProvider.GetRequiredService<IParserOrchestrationService>();
 Use the request model that matches your input source:
 
 - `FilePathParseRequestModel` for file-backed content
-- `StreamParseRequestModel` for readable, seekable streams
-- `MemoryParseRequestModel` for `ReadOnlyMemory<byte>` buffers
-- `BatchParseRequestModel` for coordinated multi-source parsing
+- `StringParseRequestModel` for string-backed XML content
 
-Each request or batch source must declare `DocumentKind` explicitly.
+Each request must declare `DocumentKind` explicitly. String-backed requests must also provide `LogicalPath` so relative imports and includes can resolve consistently.
 
 ## Parse A File
 
@@ -35,15 +33,18 @@ var graph = await parser.ParseFileAsync(
 	cancellationToken);
 ```
 
-## Parse A Stream
+## Parse A String
 
 ```csharp
-await using var stream = File.OpenRead("schemas/service.wsdl");
+const string wsdlText =
+	"<wsdl:definitions xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\" " +
+	"xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">" +
+	"<wsdl:types><xs:schema /></wsdl:types></wsdl:definitions>";
 
-var graph = await parser.ParseStreamAsync(
-	new StreamParseRequestModel
+var graph = await parser.ParseStringAsync(
+	new StringParseRequestModel
 	{
-		Content = stream,
+		Content = wsdlText,
 		DisplayName = "service.wsdl",
 		LogicalPath = "schemas/service.wsdl",
 		DocumentKind = ESchemaDocumentKind.Wsdl,
@@ -51,28 +52,31 @@ var graph = await parser.ParseStreamAsync(
 	cancellationToken);
 ```
 
-## Parse Memory Content
+## Use The Typed Parser Seams
 
 ```csharp
-ReadOnlyMemory<byte> buffer = await File.ReadAllBytesAsync("schemas/common.xsd", cancellationToken);
+var xsdParser = serviceProvider.GetRequiredService<IXsdParser>();
 
-var graph = await parser.ParseMemoryAsync(
-	new MemoryParseRequestModel
-	{
-		Buffer = buffer,
-		DisplayName = "common.xsd",
-		LogicalPath = "schemas/common.xsd",
-		DocumentKind = ESchemaDocumentKind.Xsd,
-	},
+var graph = await xsdParser.ParseFromStringAsync(
+	"<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" />",
+	"schemas/common.xsd",
 	cancellationToken);
 ```
 
 ## Handle Failures
 
 ```csharp
+var invalidRequest = new StringParseRequestModel
+{
+	Content = string.Empty,
+	DisplayName = "invalid.xsd",
+	LogicalPath = "schemas/invalid.xsd",
+	DocumentKind = ESchemaDocumentKind.Xsd,
+};
+
 try
 {
-	await parser.ParseBatchAsync(batchRequest, cancellationToken);
+	await parser.ParseStringAsync(invalidRequest, cancellationToken);
 }
 catch (ParseFailureException ex)
 {

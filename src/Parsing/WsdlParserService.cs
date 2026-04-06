@@ -4,7 +4,7 @@ using XsdXmlParser.Core.Models;
 namespace XsdXmlParser.Core.Parsing;
 
 /// <summary>
-/// Provides async WSDL parse entry points for supported input types.
+/// Provides async WSDL parse entry points for file-backed and string-backed inputs.
 /// </summary>
 public sealed class WsdlParserService : IWsdlParser
 {
@@ -36,22 +36,6 @@ public sealed class WsdlParserService : IWsdlParser
     }
 
     /// <inheritdoc/>
-    public async Task<MetadataGraphModel> ParseBatchAsync(IEnumerable<BatchSourceRequestModel> sources, CancellationToken cancellationToken)
-    {
-        if (parserOrchestrationService is not null)
-        {
-            return await parserOrchestrationService.ParseBatchAsync(new BatchParseRequestModel { Sources = sources.ToArray() }, cancellationToken).ConfigureAwait(false);
-        }
-
-        var localSourceLoader = sourceLoader ?? throw new InvalidOperationException("The source loader is not available for compatibility parsing.");
-        var localWsdlDiscoveryService = wsdlDiscoveryService ?? throw new InvalidOperationException("The WSDL discovery service is not available for compatibility parsing.");
-        var localMetadataGraphBuilder = metadataGraphBuilder ?? throw new InvalidOperationException("The metadata graph builder is not available for compatibility parsing.");
-        var descriptors = await localSourceLoader.LoadBatchAsync(sources, cancellationToken).ConfigureAwait(false);
-        var discovered = await localWsdlDiscoveryService.DiscoverAsync(descriptors, cancellationToken).ConfigureAwait(false);
-        return await localMetadataGraphBuilder.BuildAsync(discovered, cancellationToken).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc/>
     public async Task<MetadataGraphModel> ParseFromFileAsync(string filePath, CancellationToken cancellationToken)
     {
         if (parserOrchestrationService is not null)
@@ -70,23 +54,31 @@ public sealed class WsdlParserService : IWsdlParser
         var localSourceLoader = sourceLoader ?? throw new InvalidOperationException("The source loader is not available for compatibility parsing.");
         var localWsdlDiscoveryService = wsdlDiscoveryService ?? throw new InvalidOperationException("The WSDL discovery service is not available for compatibility parsing.");
         var localMetadataGraphBuilder = metadataGraphBuilder ?? throw new InvalidOperationException("The metadata graph builder is not available for compatibility parsing.");
-        var descriptor = await localSourceLoader.LoadFromFileAsync(filePath, cancellationToken).ConfigureAwait(false);
+        var descriptor = await localSourceLoader.LoadAsync(
+            new FilePathParseRequestModel
+            {
+                DisplayName = Path.GetFileName(filePath),
+                DocumentKind = ESchemaDocumentKind.Wsdl,
+                FilePath = filePath,
+                LogicalPath = filePath,
+            },
+            cancellationToken).ConfigureAwait(false);
         var discovered = await localWsdlDiscoveryService.DiscoverAsync(new[] { descriptor }, cancellationToken).ConfigureAwait(false);
         return await localMetadataGraphBuilder.BuildAsync(discovered, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task<MetadataGraphModel> ParseFromMemoryAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken)
+    public async Task<MetadataGraphModel> ParseFromStringAsync(string content, string logicalPath, CancellationToken cancellationToken)
     {
         if (parserOrchestrationService is not null)
         {
-            return await parserOrchestrationService.ParseMemoryAsync(
-                new MemoryParseRequestModel
+            return await parserOrchestrationService.ParseStringAsync(
+                new StringParseRequestModel
                 {
-                    Buffer = buffer,
-                    DisplayName = "memory-source.wsdl",
+                    Content = content,
+                    DisplayName = Path.GetFileName(logicalPath),
                     DocumentKind = ESchemaDocumentKind.Wsdl,
-                    LogicalPath = "memory-source.wsdl",
+                    LogicalPath = logicalPath,
                 },
                 cancellationToken).ConfigureAwait(false);
         }
@@ -94,31 +86,15 @@ public sealed class WsdlParserService : IWsdlParser
         var localSourceLoader = sourceLoader ?? throw new InvalidOperationException("The source loader is not available for compatibility parsing.");
         var localWsdlDiscoveryService = wsdlDiscoveryService ?? throw new InvalidOperationException("The WSDL discovery service is not available for compatibility parsing.");
         var localMetadataGraphBuilder = metadataGraphBuilder ?? throw new InvalidOperationException("The metadata graph builder is not available for compatibility parsing.");
-        var descriptor = await localSourceLoader.LoadFromMemoryAsync("memory-source", "memory-source", buffer, cancellationToken).ConfigureAwait(false);
-        var discovered = await localWsdlDiscoveryService.DiscoverAsync(new[] { descriptor }, cancellationToken).ConfigureAwait(false);
-        return await localMetadataGraphBuilder.BuildAsync(discovered, cancellationToken).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc/>
-    public async Task<MetadataGraphModel> ParseFromStreamAsync(Stream stream, CancellationToken cancellationToken)
-    {
-        if (parserOrchestrationService is not null)
-        {
-            return await parserOrchestrationService.ParseStreamAsync(
-                new StreamParseRequestModel
-                {
-                    Content = stream,
-                    DisplayName = "stream-source.wsdl",
-                    DocumentKind = ESchemaDocumentKind.Wsdl,
-                    LogicalPath = "stream-source.wsdl",
-                },
-                cancellationToken).ConfigureAwait(false);
-        }
-
-        var localSourceLoader = sourceLoader ?? throw new InvalidOperationException("The source loader is not available for compatibility parsing.");
-        var localWsdlDiscoveryService = wsdlDiscoveryService ?? throw new InvalidOperationException("The WSDL discovery service is not available for compatibility parsing.");
-        var localMetadataGraphBuilder = metadataGraphBuilder ?? throw new InvalidOperationException("The metadata graph builder is not available for compatibility parsing.");
-        var descriptor = await localSourceLoader.LoadFromStreamAsync("stream-source", "stream-source", stream, cancellationToken).ConfigureAwait(false);
+        var descriptor = await localSourceLoader.LoadAsync(
+            new StringParseRequestModel
+            {
+                Content = content,
+                DisplayName = Path.GetFileName(logicalPath),
+                DocumentKind = ESchemaDocumentKind.Wsdl,
+                LogicalPath = logicalPath,
+            },
+            cancellationToken).ConfigureAwait(false);
         var discovered = await localWsdlDiscoveryService.DiscoverAsync(new[] { descriptor }, cancellationToken).ConfigureAwait(false);
         return await localMetadataGraphBuilder.BuildAsync(discovered, cancellationToken).ConfigureAwait(false);
     }

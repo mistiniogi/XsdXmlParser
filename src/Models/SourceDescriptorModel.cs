@@ -16,7 +16,7 @@ public sealed class SourceDescriptorModel
     public string SourceId { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the source origin kind.
+    /// Gets or sets the normalized source origin kind.
     /// </summary>
     public ESourceKind SourceKind { get; set; }
 

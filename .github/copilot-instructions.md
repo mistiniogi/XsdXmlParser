@@ -29,6 +29,8 @@ by the feature, make the smallest possible change that satisfies the requirement
 - C# 10.0 with .NET 6, .NET 7, and .NET 8 (001-wsdl-xml-parser)
 - C# 10.0 on .NET 6.0, .NET 7.0, and .NET 8.0 + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions` (003-complete-async-parser)
 - In-memory source descriptors, centralized registry services, and normalized metadata graph dictionaries (003-complete-async-parser)
+- C# 10.0 on .NET 6.0, .NET 7.0, and .NET 8.0 + `System.Xml`, `System.Text`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions` (004-simplify-source-loading)
+- In-memory source descriptors, virtual file metadata, centralized registry services, and normalized metadata graph dictionaries (004-simplify-source-loading)
 
 ## Project Structure
 ```text
@@ -57,9 +59,9 @@ Before generating any new file or modifying an existing one for a speckit featur
 - [ ] No hardcoded strings — use constants or resource identifiers consistent with existing patterns
 
 ## Recent Changes
+- 004-simplify-source-loading: Added C# 10.0 on .NET 6.0, .NET 7.0, and .NET 8.0 + `System.Xml`, `System.Text`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`
+- 004-simplify-source-loading: Added C# 10.0 on .NET 6.0, .NET 7.0, and .NET 8.0 + `System.Xml`, `System.Text`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`
 - 003-complete-async-parser: Added C# 10.0 on .NET 6.0, .NET 7.0, and .NET 8.0 + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`
-- 002-multi-source-parser: Added C# 10.0 with .NET 6.0, .NET 7.0, and .NET 8.0 + System.Xml, System.Text.Json, Microsoft.Extensions.DependencyInjection, Microsoft.Extensions.Logging.Abstractions
-- 001-wsdl-xml-parser: Adopted async-first DI-friendly library rules for C# 10.0 on .NET 6, .NET 7, and .NET 8
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

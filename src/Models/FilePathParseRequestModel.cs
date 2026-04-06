@@ -6,7 +6,7 @@ namespace XsdXmlParser.Core.Models;
 public sealed class FilePathParseRequestModel : ParseRequestModel
 {
     /// <summary>
-    /// Gets or sets the file path to parse.
+    /// Gets or sets the physical file path to parse.
     /// </summary>
     public string FilePath { get; set; } = string.Empty;
 }
