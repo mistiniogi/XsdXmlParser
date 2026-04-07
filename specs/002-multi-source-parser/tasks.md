@@ -3,7 +3,7 @@
 **Input**: Design documents from `/specs/002-multi-source-parser/`
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/, quickstart.md
 
-**Tests**: Unit, integration, contract, compatibility, cancellation, and performance validation tasks are included where required by the spec and constitution.
+**Tests**: Integration, compatibility, cancellation, and performance validation tasks are included where required by the spec and constitution.
 
 **Organization**: Tasks are grouped by user story and ordered by folder focus: `Abstractions`, `Models`, `Registry`, and `Parsing`, followed by supporting serialization, DI, and validation tasks where required.
 
@@ -16,7 +16,7 @@
 ## Path Conventions
 
 - Source: `src/`
-- Tests: `tests/`
+- Tests: `tests/Integration/`
 - Documentation: `specs/002-multi-source-parser/`
 
 ---
@@ -27,7 +27,7 @@
 
 - [X] T001 Update `XsdXmlParser.csproj` to support `net6.0;net7.0;net8.0`, C# 10.0, and the package references required by the multi-source parser plan
 - [X] T002 Create source folder structure under `src/Abstractions/`, `src/Models/`, `src/Registry/`, `src/Parsing/`, `src/Serialization/`, and `src/Extensions/`
-- [X] T003 Create test folder structure under `tests/Unit/Registry/`, `tests/Unit/Parsing/`, `tests/Unit/Serialization/`, `tests/Unit/RefIds/`, `tests/Integration/SingleSource/`, `tests/Integration/MultiSource/`, `tests/Integration/Cycles/`, and `tests/Contract/MetadataGraph/`
+- [X] T003 Create test folder structure under `tests/Integration/SingleSource/`, `tests/Integration/MultiSource/`, `tests/Integration/Cycles/`, and `tests/Integration/MetadataGraph/`
 - [X] T004 Add or update solution-wide analyzer and nullable settings in `.editorconfig` for the new `src/` and `tests/` layout
 - [X] T005 Add documentation placeholders to `README.md` and `specs/002-multi-source-parser/quickstart.md` for the new component names and two-pass parsing flow
 
@@ -135,7 +135,7 @@
 
 ### Validation
 
-- [ ] T060 [US1] Add source-parity and deterministic-RefId unit tests in `tests/Unit/Parsing/SingleSourceParserParityTests.cs` and `tests/Unit/RefIds/DeterministicRefIdTests.cs`
+- [ ] T060 [US1] Add source-parity and deterministic-RefId integration coverage in `tests/Integration/SingleSource/SingleSourceParserParityTests.cs` and `tests/Integration/SingleSource/DeterministicRefIdTests.cs`
 - [ ] T061 [US1] Add `SC-001` integration coverage in `tests/Integration/SingleSource/SingleSourceParityTests.cs`
 
 **Checkpoint**: Equivalent single-source inputs produce the same logical graph.
@@ -230,8 +230,8 @@
 
 ### Validation
 
-- [ ] T099 [US3] Add metadata graph contract coverage for `SC-003` and `SC-004` in `tests/Contract/MetadataGraph/NormalizedGraphContractTests.cs`
-- [ ] T100 [US3] Add graph-only validation coverage for `SC-005` in `tests/Contract/MetadataGraph/GraphOnlyValidationMetadataTests.cs`
+- [ ] T099 [US3] Add metadata graph integration coverage for `SC-003` and `SC-004` in `tests/Integration/MetadataGraph/NormalizedGraphIntegrationTests.cs`
+- [ ] T100 [US3] Add graph-only validation integration coverage for `SC-005` in `tests/Integration/MetadataGraph/GraphOnlyValidationMetadataTests.cs`
 
 **Checkpoint**: Downstream consumers can validate XML using only the exported metadata graph.
 
@@ -271,7 +271,7 @@
 
 ### Validation
 
-- [ ] T112 [US4] Add generation-metadata contract coverage for `SC-006` and `SC-007` in `tests/Contract/MetadataGraph/GenerationMetadataContractTests.cs`
+- [ ] T112 [US4] Add generation-metadata integration coverage for `SC-006` and `SC-007` in `tests/Integration/MetadataGraph/GenerationMetadataIntegrationTests.cs`
 
 **Checkpoint**: Exported graphs preserve enough structure and rules for future rule-based XML generation.
 
@@ -285,7 +285,7 @@
 - [ ] T116 Update `README.md` with package-level guidance for multi-source parsing and normalized metadata graph serialization
 - [ ] T117 Verify the feature build and package metadata in `XsdXmlParser.csproj` against the completed `src/` layout and DI registrations
 - [ ] T118 Add multi-target compatibility validation for `net6.0`, `net7.0`, and `net8.0` in `XsdXmlParser.csproj` and document the validation matrix in `README.md`
-- [ ] T119 Add cancellation propagation coverage in `tests/Unit/Parsing/CancellationPropagationTests.cs` and `tests/Integration/MultiSource/CancellationFlowTests.cs`
+- [ ] T119 Add cancellation propagation coverage in `tests/Integration/SingleSource/CancellationPropagationTests.cs` and `tests/Integration/MultiSource/CancellationFlowTests.cs`
 - [ ] T120 Add representative multi-file parsing performance validation in `tests/Integration/MultiSource/ParserPerformanceValidationTests.cs`
 - [ ] T121 Add and review inline `Why` comments in complex traversal, canonicalization, and cycle-handling code under `src/Registry/` and `src/Parsing/`
 

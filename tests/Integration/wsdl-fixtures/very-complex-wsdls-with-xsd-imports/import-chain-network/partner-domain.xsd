@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema
+    targetNamespace="urn:fixtures:import-chain-network:schemas:partner"
+    elementFormDefault="qualified"
+    xmlns:ids="urn:fixtures:import-chain-network:schemas:identifiers"
+    xmlns:partner="urn:fixtures:import-chain-network:schemas:partner"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:import namespace="urn:fixtures:import-chain-network:schemas:identifiers" schemaLocation="shared-identifiers.xsd" />
+  <xsd:complexType name="PartnerProfileType">
+    <xsd:sequence>
+      <xsd:element name="partnerId" type="ids:PartnerIdentifierType" />
+      <xsd:element name="partnerRegion" type="xsd:string" />
+      <xsd:element name="lineOfBusiness" type="ids:LineOfBusinessType" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

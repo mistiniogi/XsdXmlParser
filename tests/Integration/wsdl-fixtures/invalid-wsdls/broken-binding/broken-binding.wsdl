@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="BrokenBindingService"
+    targetNamespace="urn:fixtures:broken-binding"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="urn:fixtures:broken-binding"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <message name="PingRequest">
+    <part name="message" type="xsd:string" />
+  </message>
+  <message name="PingResponse">
+    <part name="message" type="xsd:string" />
+  </message>
+  <portType name="BrokenBindingPortType">
+    <operation name="Ping">
+      <input message="tns:PingRequest" />
+      <output message="tns:PingResponse" />
+    </operation>
+  </portType>
+  <binding name="BrokenBinding" type="tns:MissingPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="Ping">
+      <soap:operation soapAction="urn:fixtures:broken-binding:Ping" />
+      <input><soap:body use="literal" /></input>
+      <output><soap:body use="literal" /></output>
+    </operation>
+  </binding>
+  <service name="BrokenBindingService">
+    <port name="BrokenBindingPort" binding="tns:BrokenBinding">
+      <soap:address location="http://example.com/broken-binding" />
+    </port>
+  </service>
+</definitions>

@@ -19,9 +19,9 @@
 <!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
 
 ### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
+<!-- Example: IV. Integration-Only Verification -->
 [PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+<!-- Example: Automated coverage lives only under tests/Integration; Focus areas include DI wiring, inter-service communication, end-to-end parsing flows, and shared schema validation -->
 
 ### [PRINCIPLE_5_NAME]
 <!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->

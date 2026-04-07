@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="MimeAttachmentHubService"
+    targetNamespace="urn:fixtures:mime-attachment-hub"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="urn:fixtures:mime-attachment-hub"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <documentation>
+    This fixture models classic WSDL 1.1 MIME multipart bindings used for binary attachments.
+    It is intended to exercise attachment-aware parsing paths, including multipart request and response layouts
+    that are commonly associated with MTOM or XOP migration scenarios even when the contract itself stays in the
+    older MIME binding form.
+  </documentation>
+  <types>
+    <xsd:schema targetNamespace="urn:fixtures:mime-attachment-hub" elementFormDefault="qualified">
+      <xsd:element name="UploadBinaryRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="documentId" type="xsd:string" />
+            <xsd:element name="mediaType" type="xsd:string" />
+            <xsd:element name="description" type="xsd:string" minOccurs="0" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="UploadBinaryResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="stored" type="xsd:boolean" />
+            <xsd:element name="contentUri" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="DownloadBinaryRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="documentId" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="DownloadBinaryResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="documentId" type="xsd:string" />
+            <xsd:element name="mediaType" type="xsd:string" />
+            <xsd:element name="contentLength" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="UploadBinaryInput">
+    <part name="manifest" element="tns:UploadBinaryRequest" />
+    <part name="binaryPayload" type="xsd:base64Binary" />
+  </message>
+  <message name="UploadBinaryOutput">
+    <part name="manifest" element="tns:UploadBinaryResponse" />
+  </message>
+  <message name="DownloadBinaryInput">
+    <part name="manifest" element="tns:DownloadBinaryRequest" />
+  </message>
+  <message name="DownloadBinaryOutput">
+    <part name="manifest" element="tns:DownloadBinaryResponse" />
+    <part name="binaryPayload" type="xsd:base64Binary" />
+  </message>
+  <portType name="MimeAttachmentHubPortType">
+    <operation name="UploadBinary">
+      <input message="tns:UploadBinaryInput" />
+      <output message="tns:UploadBinaryOutput" />
+    </operation>
+    <operation name="DownloadBinary">
+      <input message="tns:DownloadBinaryInput" />
+      <output message="tns:DownloadBinaryOutput" />
+    </operation>
+  </portType>
+  <binding name="MimeAttachmentHubBinding" type="tns:MimeAttachmentHubPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="UploadBinary">
+      <soap:operation soapAction="urn:fixtures:mime-attachment-hub:UploadBinary" />
+      <input>
+        <mime:multipartRelated>
+          <mime:part>
+            <soap:body parts="manifest" use="literal" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="binaryPayload" type="application/octet-stream" />
+          </mime:part>
+        </mime:multipartRelated>
+      </input>
+      <output>
+        <soap:body parts="manifest" use="literal" />
+      </output>
+    </operation>
+    <operation name="DownloadBinary">
+      <soap:operation soapAction="urn:fixtures:mime-attachment-hub:DownloadBinary" />
+      <input>
+        <soap:body parts="manifest" use="literal" />
+      </input>
+      <output>
+        <mime:multipartRelated>
+          <mime:part>
+            <soap:body parts="manifest" use="literal" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="binaryPayload" type="application/pdf" />
+          </mime:part>
+        </mime:multipartRelated>
+      </output>
+    </operation>
+  </binding>
+  <service name="MimeAttachmentHubService">
+    <port name="MimeAttachmentHubPort" binding="tns:MimeAttachmentHubBinding">
+      <soap:address location="http://example.com/mime-attachment-hub" />
+    </port>
+  </service>
+</definitions>

@@ -12,7 +12,7 @@ Develop the `XsdXmlParser.Core` WSDL 1.1 and XSD parser library for .NET 6.0, .N
 **Language/Version**: C# 10.0 with .NET 6.0, .NET 7.0, and .NET 8.0 (multi-targeted)  
 **Primary Dependencies**: System.Xml, System.Text.Json, Microsoft.Extensions.DependencyInjection, Microsoft.Extensions.Logging  
 **Storage**: Type Registry (Centralized ID-based singleton via DI)  
-**Testing**: xUnit with Moq  
+**Testing**: Integration coverage under `tests/Integration`  
 **Target Platform**: Cross-platform (.NET 6.0, .NET 7.0, .NET 8.0)  
 **Project Type**: Library (public API, no CLI)  
 **Performance Goals**: Parse schemas up to 10,000 elements in <1 second; memory target <500 MB  
@@ -123,22 +123,16 @@ src/
 └── TypeRegistry.cs (singleton DI service, manages element parser singletons)
 
 tests/
-├── Unit/
-│   ├── Parsers/
-│   │   ├── WSDLParserTests.cs
-│   │   ├── XSDParserTests.cs
-│   │   └── ElementParserTests.cs
-│   ├── Validators/
-│   │   └── FacetValidatorTests.cs
-│   └── Generators/
-│       ├── JSONGeneratorTests.cs
-│       └── XMLGeneratorTests.cs
 └── Integration/
-    ├── EndToEndParsingTests.cs
-    └── DIRegistrationTests.cs
+  ├── EndToEndParsingTests.cs
+  ├── DIRegistrationTests.cs
+  ├── WsdlParserIntegrationTests.cs
+  ├── XsdParserIntegrationTests.cs
+  ├── JsonMetadataIntegrationTests.cs
+  └── XmlGenerationIntegrationTests.cs
 ```
 
-**Structure Decision**: Clean Architecture with professional dependency injection, enforced SRP through method complexity limits, strict element-to-class mapping, and a centralized ID-based type registry. Separation into Models (data), Services (abstractions), Implementations (behavior), Parsers (element handlers), and Extensions (DI configuration). Tests mirror source structure with dedicated DI and validator test folders.
+**Structure Decision**: Clean Architecture with professional dependency injection, enforced SRP through method complexity limits, strict element-to-class mapping, and a centralized ID-based type registry. Separation into Models (data), Services (abstractions), Implementations (behavior), Parsers (element handlers), and Extensions (DI configuration). Automated verification is consolidated under `tests/Integration` for end-to-end parsing, generation, and DI scenarios.
 
 Early benchmark and cancellation validation are treated as foundational work so performance and async behavior are verified before story implementation expands.
 
@@ -174,7 +168,7 @@ Early benchmark and cancellation validation are treated as foundational work so 
 |---|---|
 | Stateless singleton ElementParsers in TypeRegistry | Supports schema reuse, reduces memory overhead; parse state passed as method parameters enables parallel parsing |
 | BaseElementParser abstract base class | Enforces SRP; centralizes common validation, metadata attachment, and documentation handling; simplifies inheritance tree |
-| DI via ServiceCollectionExtensions | Standard .NET Core pattern; simplifies consumer integration; aligns with dependency injection best practices; supports testing via mocking |
+| DI via ServiceCollectionExtensions | Standard .NET Core pattern; simplifies consumer integration; aligns with dependency injection best practices; supports realistic integration verification through composed service resolution |
 | Separate ElementParser folder (one class per named element) | Enforces strict one-to-one element-to-class mapping requirement; improves maintainability and testability at scale (10k+ elements) |
 | Composition validators over inheritance | More flexible constraint handling; avoids deep inheritance chains; supports dynamic validator attachment |
 | Multi-targeted .NET 6.0 + 7.0 + 8.0 | Preserves consumer compatibility across the supported LTS/current matrix while keeping shared code on C# 10.0 |
@@ -187,9 +181,8 @@ Early benchmark and cancellation validation are treated as foundational work so 
 - `Microsoft.Extensions.Logging` (structured logging)
 - `System.Xml` (built-in; WSDL/XSD parsing)
 - `System.Text.Json` (built-in; JSON generation)
-- **Test dependencies**:
-  - `xUnit` (testing framework)
-  - `Moq` (mocking framework)
+- **Validation and quality dependencies**:
+  - `xUnit` (integration test framework)
   - `StyleCop.Analyzers` (static analysis)
   - `SonarAnalyzer.CSharp` (code quality)
 

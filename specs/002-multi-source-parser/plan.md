@@ -76,20 +76,14 @@ src/
 └── Extensions/
 
 tests/
-├── Unit/
-│   ├── Registry/
-│   ├── Parsing/
-│   ├── Serialization/
-│   └── RefIds/
-├── Integration/
+└── Integration/
 │   ├── SingleSource/
 │   ├── MultiSource/
-│   └── Cycles/
-└── Contract/
-    └── MetadataGraph/
+│   ├── Cycles/
+│   └── MetadataGraph/
 ```
 
-**Structure Decision**: Use a single multi-target library with feature-oriented folders for abstractions, models, registry orchestration, parsing services, serialization, and DI registration. Mirror that structure in tests with unit, integration, and contract suites aligned to the highest-risk behaviors in the specification.
+**Structure Decision**: Use a single multi-target library with feature-oriented folders for abstractions, models, registry orchestration, parsing services, serialization, and DI registration. Consolidate automated verification under `tests/Integration`, with scenario folders aligned to the highest-risk behaviors in the specification.
 
 ## Implementation Phases
 
@@ -115,7 +109,7 @@ tests/
 
 - Populate canonical graph dictionaries from the registry.
 - Link type relationships, inheritance, validation rules, occurrence bounds, and flattened compositor metadata.
-- Serialize the graph with stable contract formatting and validate the contract through integration and contract tests.
+- Serialize the graph with stable graph formatting and validate the exported contract through integration tests.
 
 ### Phase 4: Hardening
 
@@ -125,9 +119,9 @@ tests/
 
 ## Validation Strategy
 
-- Unit tests validate deterministic `RefId` generation, source normalization, registry canonicalization, duplicate detection, and serializer converter behavior.
+- Integration tests validate deterministic `RefId` generation, source normalization, registry canonicalization, duplicate detection, and serializer converter behavior.
 - Integration tests validate single-source parity, multi-source resolution, cycle-safe traversal, ambiguous-root failures, and invalid-main-source failures.
-- Contract tests validate dictionary-based graph shape, `RefId`-only child relationships, preserved validation metadata, and generation-oriented compositor hints.
+- Integration tests validate dictionary-based graph shape, `RefId`-only child relationships, preserved validation metadata, and generation-oriented compositor hints.
 - Compatibility validation confirms the feature builds and test assets remain green across `net6.0`, `net7.0`, and `net8.0`.
 
 ## Risks and Mitigations
@@ -139,7 +133,7 @@ tests/
 - Risk: Non-file inputs can lose stable identity or relative path context.
   Mitigation: Require caller-supplied logical identity and logical path metadata for batch inputs and normalize all source types through `SourceDescriptorModel`.
 - Risk: Flattening compositor structures can lose downstream meaning.
-  Mitigation: Preserve choice-group identifiers, compositor kind, and ordering hints at the member level and cover them in contract tests.
+  Mitigation: Preserve choice-group identifiers, compositor kind, and ordering hints at the member level and cover them in integration tests.
 
 ## Complexity Tracking
 

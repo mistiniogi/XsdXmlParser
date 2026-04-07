@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="SchemaEdgeCatalogService"
+    targetNamespace="urn:fixtures:schema-edge-catalog"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="urn:fixtures:schema-edge-catalog"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <xsd:schema
+        id="schema-edge-root"
+        targetNamespace="urn:fixtures:schema-edge-catalog"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified">
+      <xsd:simpleType name="TrackingCodeType" id="tracking-code-type">
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="[A-Z]{3}-[0-9]{4}" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="LifecycleStatusType" id="lifecycle-status-type">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="draft" />
+          <xsd:enumeration value="active" />
+          <xsd:enumeration value="retired" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:attributeGroup name="AuditAttributeGroup" id="audit-attribute-group">
+        <xsd:attribute name="createdBy" type="xsd:string" use="required" />
+        <xsd:attribute name="createdUtc" type="xsd:dateTime" use="required" />
+        <xsd:attribute name="updatedBy" type="xsd:string" />
+        <xsd:attribute name="updatedUtc" type="xsd:dateTime" />
+      </xsd:attributeGroup>
+      <xsd:complexType name="PriceWithCurrencyType" id="price-with-currency-type">
+        <xsd:simpleContent>
+          <xsd:extension base="xsd:decimal">
+            <xsd:attribute name="currency" type="xsd:string" use="required" fixed="USD" />
+          </xsd:extension>
+        </xsd:simpleContent>
+      </xsd:complexType>
+      <xsd:element name="shared-address" id="shared-address-element">
+        <xsd:complexType>
+          <xsd:all>
+            <xsd:element name="line1" type="xsd:string" />
+            <xsd:element name="city" type="xsd:string" />
+            <xsd:element name="postalCode" type="xsd:string" />
+            <xsd:element name="countryCode" type="xsd:string" default="US" />
+          </xsd:all>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="BaseEntry" type="tns:BaseEntryType" abstract="true" id="base-entry-element" />
+      <xsd:complexType name="BaseEntryType" id="base-entry-type">
+        <xsd:sequence>
+          <xsd:element name="entryId" type="tns:TrackingCodeType" />
+          <xsd:element name="status" type="tns:LifecycleStatusType" default="draft" />
+          <xsd:element ref="tns:shared-address" minOccurs="0" />
+          <xsd:element name="notes" type="xsd:string" minOccurs="0" maxOccurs="5000" />
+        </xsd:sequence>
+        <xsd:attributeGroup ref="tns:AuditAttributeGroup" />
+        <xsd:attribute name="tenant" type="xsd:string" use="required" />
+      </xsd:complexType>
+      <xsd:complexType name="SlimEntryType" id="slim-entry-type">
+        <xsd:complexContent>
+          <xsd:restriction base="tns:BaseEntryType">
+            <xsd:sequence>
+              <xsd:element name="entryId" type="tns:TrackingCodeType" />
+              <xsd:element name="status" type="tns:LifecycleStatusType" fixed="active" />
+            </xsd:sequence>
+            <xsd:attributeGroup ref="tns:AuditAttributeGroup" />
+            <xsd:attribute name="tenant" type="xsd:string" use="required" />
+          </xsd:restriction>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:complexType name="TreeNodeType" id="tree-node-type">
+        <xsd:sequence>
+          <xsd:element name="nodeId" type="xsd:string" />
+          <xsd:element name="label" type="xsd:string" />
+          <xsd:element name="child" type="tns:TreeNodeType" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="SpecialEntryType" id="special-entry-type">
+        <xsd:complexContent>
+          <xsd:extension base="tns:BaseEntryType">
+            <xsd:sequence>
+              <xsd:element name="priority" type="xsd:int" minOccurs="0" default="1" />
+              <xsd:element name="price" type="tns:PriceWithCurrencyType" minOccurs="0" />
+              <xsd:element name="child" type="tns:TreeNodeType" minOccurs="0" />
+            </xsd:sequence>
+            <xsd:attribute name="channel" type="xsd:string" default="web" />
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:element name="SpecialEntry" type="tns:SpecialEntryType" substitutionGroup="tns:BaseEntry" id="special-entry-element" />
+      <xsd:complexType name="AttributeHeavyProfileType" id="attribute-heavy-profile-type">
+        <xsd:attributeGroup ref="tns:AuditAttributeGroup" />
+        <xsd:attribute name="profileId" type="xsd:ID" use="required" />
+        <xsd:attribute name="segment" type="xsd:string" default="standard" />
+        <xsd:attribute name="sourceSystem" type="xsd:string" fixed="catalog-hub" />
+        <xsd:attribute name="preferredRegion" type="xsd:string" />
+        <xsd:attribute name="profileState" type="tns:LifecycleStatusType" fixed="active" />
+        <xsd:anyAttribute processContents="lax" />
+      </xsd:complexType>
+      <xsd:complexType name="PreferenceProfileType" id="preference-profile-type">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="emailAddress" type="xsd:string" />
+          <xsd:element name="phoneNumber" type="xsd:string" />
+          <xsd:element ref="tns:SpecialEntry" />
+        </xsd:choice>
+        <xsd:attributeGroup ref="tns:AuditAttributeGroup" />
+        <xsd:attribute name="locale" type="xsd:string" default="en-US" />
+        <xsd:attribute name="marketingOptIn" type="xsd:boolean" fixed="true" />
+        <xsd:anyAttribute processContents="lax" />
+      </xsd:complexType>
+      <xsd:element name="CatalogMutationRequest" id="catalog-mutation-request">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="profile" type="tns:PreferenceProfileType" />
+            <xsd:element name="attributeHeavyProfile" type="tns:AttributeHeavyProfileType" minOccurs="0" />
+            <xsd:element name="rootNode" type="tns:TreeNodeType" minOccurs="0" nillable="true" />
+            <xsd:element name="priorityBand" default="gold">
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                  <xsd:enumeration value="bronze" />
+                  <xsd:enumeration value="silver" />
+                  <xsd:enumeration value="gold" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="wrappedAliases" minOccurs="0">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element name="alias" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="extensionBucket" minOccurs="0">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="strict" />
+                </xsd:sequence>
+                <xsd:anyAttribute processContents="strict" />
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+          <xsd:attribute name="requestId" type="xsd:ID" use="required" />
+          <xsd:attribute name="mode" type="tns:LifecycleStatusType" default="draft" />
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="CatalogMutationResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="accepted" type="xsd:boolean" />
+            <xsd:element name="snapshotVersion" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="CatalogSnapshotRequest">
+        <xsd:complexType>
+          <xsd:all>
+            <xsd:element name="trackingCode" type="tns:TrackingCodeType" />
+            <xsd:element name="includeInactive" type="xsd:boolean" minOccurs="0" default="false" />
+            <xsd:element name="includeHistory" type="xsd:boolean" minOccurs="0" default="false" />
+          </xsd:all>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="CatalogSnapshotResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element ref="tns:BaseEntry" minOccurs="0" maxOccurs="unbounded" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="CatalogValidationFault">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="faultCode" type="xsd:string" />
+            <xsd:element name="faultMessage" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="CatalogConflictFault">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="trackingCode" type="tns:TrackingCodeType" />
+            <xsd:element name="faultMessage" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="CatalogMutationInput">
+    <part name="parameters" element="tns:CatalogMutationRequest" />
+  </message>
+  <message name="CatalogMutationOutput">
+    <part name="parameters" element="tns:CatalogMutationResponse" />
+  </message>
+  <message name="CatalogSnapshotInput">
+    <part name="parameters" element="tns:CatalogSnapshotRequest" />
+  </message>
+  <message name="CatalogSnapshotOutput">
+    <part name="parameters" element="tns:CatalogSnapshotResponse" />
+  </message>
+  <message name="CatalogValidationFaultMessage">
+    <part name="fault" element="tns:CatalogValidationFault" />
+  </message>
+  <message name="CatalogConflictFaultMessage">
+    <part name="fault" element="tns:CatalogConflictFault" />
+  </message>
+  <portType name="SchemaEdgeCatalogPortType">
+    <operation name="SubmitCatalogMutation">
+      <input message="tns:CatalogMutationInput" />
+      <output message="tns:CatalogMutationOutput" />
+      <fault name="CatalogValidationFault" message="tns:CatalogValidationFaultMessage" />
+      <fault name="CatalogConflictFault" message="tns:CatalogConflictFaultMessage" />
+    </operation>
+    <operation name="ReadCatalogSnapshot">
+      <input message="tns:CatalogSnapshotInput" />
+      <output message="tns:CatalogSnapshotOutput" />
+      <fault name="CatalogConflictFault" message="tns:CatalogConflictFaultMessage" />
+    </operation>
+  </portType>
+  <binding name="SchemaEdgeCatalogBinding" type="tns:SchemaEdgeCatalogPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="SubmitCatalogMutation">
+      <soap:operation soapAction="urn:fixtures:schema-edge-catalog:SubmitCatalogMutation" />
+      <input><soap:body use="literal" /></input>
+      <output><soap:body use="literal" /></output>
+      <fault name="CatalogValidationFault"><soap:fault name="CatalogValidationFault" use="literal" /></fault>
+      <fault name="CatalogConflictFault"><soap:fault name="CatalogConflictFault" use="literal" /></fault>
+    </operation>
+    <operation name="ReadCatalogSnapshot">
+      <soap:operation soapAction="urn:fixtures:schema-edge-catalog:ReadCatalogSnapshot" />
+      <input><soap:body use="literal" /></input>
+      <output><soap:body use="literal" /></output>
+      <fault name="CatalogConflictFault"><soap:fault name="CatalogConflictFault" use="literal" /></fault>
+    </operation>
+  </binding>
+  <service name="SchemaEdgeCatalogService">
+    <port name="SchemaEdgeCatalogPort" binding="tns:SchemaEdgeCatalogBinding">
+      <soap:address location="http://example.com/schema-edge-catalog" />
+    </port>
+  </service>
+</definitions>

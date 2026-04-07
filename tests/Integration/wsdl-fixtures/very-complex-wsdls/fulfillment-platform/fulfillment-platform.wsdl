@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="FulfillmentPlatformService"
+    targetNamespace="urn:fixtures:fulfillment-platform"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="urn:fixtures:fulfillment-platform"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <xsd:schema targetNamespace="urn:fixtures:fulfillment-platform" elementFormDefault="qualified">
+      <xsd:complexType name="ContactType"><xsd:sequence><xsd:element name="name" type="xsd:string" /><xsd:element name="email" type="xsd:string" /><xsd:element name="phone" type="xsd:string" minOccurs="0" /></xsd:sequence></xsd:complexType>
+      <xsd:complexType name="WarehouseType"><xsd:sequence><xsd:element name="warehouseId" type="xsd:string" /><xsd:element name="manager" type="tns:ContactType" /><xsd:element name="region" type="xsd:string" /></xsd:sequence></xsd:complexType>
+      <xsd:complexType name="PackageType"><xsd:sequence><xsd:element name="packageId" type="xsd:string" /><xsd:element name="weightKg" type="xsd:decimal" /><xsd:element name="hazmat" type="xsd:boolean" /><xsd:element name="warehouse" type="tns:WarehouseType" /></xsd:sequence></xsd:complexType>
+      <xsd:complexType name="ShipmentType"><xsd:sequence><xsd:element name="shipmentId" type="xsd:string" /><xsd:element name="priority" type="xsd:string" /><xsd:element name="package" type="tns:PackageType" minOccurs="1" maxOccurs="unbounded" /></xsd:sequence></xsd:complexType>
+      <xsd:complexType name="WorkflowStepType"><xsd:sequence><xsd:element name="stepCode" type="xsd:string" /><xsd:element name="status" type="xsd:string" /><xsd:element name="assignedTeam" type="xsd:string" /></xsd:sequence></xsd:complexType>
+      <xsd:element name="PlanShipmentRequest" type="tns:ShipmentType" />
+      <xsd:element name="PlanShipmentResponse"><xsd:complexType><xsd:sequence><xsd:element name="workflowStep" type="tns:WorkflowStepType" minOccurs="1" maxOccurs="unbounded" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="RouteShipmentRequest"><xsd:complexType><xsd:sequence><xsd:element name="shipmentId" type="xsd:string" /><xsd:element name="targetRegion" type="xsd:string" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="RouteShipmentResponse"><xsd:complexType><xsd:sequence><xsd:element name="routeId" type="xsd:string" /><xsd:element name="estimatedHours" type="xsd:int" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="ReserveInventoryRequest"><xsd:complexType><xsd:sequence><xsd:element name="shipmentId" type="xsd:string" /><xsd:element name="warehouseId" type="xsd:string" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="ReserveInventoryResponse"><xsd:complexType><xsd:sequence><xsd:element name="reservationId" type="xsd:string" /><xsd:element name="expiresUtc" type="xsd:dateTime" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="DispatchShipmentRequest"><xsd:complexType><xsd:sequence><xsd:element name="shipmentId" type="xsd:string" /><xsd:element name="carrierCode" type="xsd:string" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="DispatchShipmentResponse"><xsd:complexType><xsd:sequence><xsd:element name="dispatchId" type="xsd:string" /><xsd:element name="dispatchedUtc" type="xsd:dateTime" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="TrackWorkflowRequest"><xsd:complexType><xsd:sequence><xsd:element name="shipmentId" type="xsd:string" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="TrackWorkflowResponse"><xsd:complexType><xsd:sequence><xsd:element name="workflowStep" type="tns:WorkflowStepType" minOccurs="0" maxOccurs="unbounded" /></xsd:sequence></xsd:complexType></xsd:element>
+      <xsd:element name="FulfillmentFault"><xsd:complexType><xsd:sequence><xsd:element name="faultCode" type="xsd:string" /><xsd:element name="faultMessage" type="xsd:string" /><xsd:element name="retryable" type="xsd:boolean" /></xsd:sequence></xsd:complexType></xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="PlanShipmentInput"><part name="parameters" element="tns:PlanShipmentRequest" /></message>
+  <message name="PlanShipmentOutput"><part name="parameters" element="tns:PlanShipmentResponse" /></message>
+  <message name="RouteShipmentInput"><part name="parameters" element="tns:RouteShipmentRequest" /></message>
+  <message name="RouteShipmentOutput"><part name="parameters" element="tns:RouteShipmentResponse" /></message>
+  <message name="ReserveInventoryInput"><part name="parameters" element="tns:ReserveInventoryRequest" /></message>
+  <message name="ReserveInventoryOutput"><part name="parameters" element="tns:ReserveInventoryResponse" /></message>
+  <message name="DispatchShipmentInput"><part name="parameters" element="tns:DispatchShipmentRequest" /></message>
+  <message name="DispatchShipmentOutput"><part name="parameters" element="tns:DispatchShipmentResponse" /></message>
+  <message name="TrackWorkflowInput"><part name="parameters" element="tns:TrackWorkflowRequest" /></message>
+  <message name="TrackWorkflowOutput"><part name="parameters" element="tns:TrackWorkflowResponse" /></message>
+  <message name="FulfillmentFaultMessage"><part name="fault" element="tns:FulfillmentFault" /></message>
+  <portType name="FulfillmentPlanningPortType">
+    <operation name="PlanShipment"><input message="tns:PlanShipmentInput" /><output message="tns:PlanShipmentOutput" /><fault name="FulfillmentFault" message="tns:FulfillmentFaultMessage" /></operation>
+    <operation name="RouteShipment"><input message="tns:RouteShipmentInput" /><output message="tns:RouteShipmentOutput" /></operation>
+    <operation name="ReserveInventory"><input message="tns:ReserveInventoryInput" /><output message="tns:ReserveInventoryOutput" /><fault name="FulfillmentFault" message="tns:FulfillmentFaultMessage" /></operation>
+  </portType>
+  <portType name="FulfillmentExecutionPortType">
+    <operation name="DispatchShipment"><input message="tns:DispatchShipmentInput" /><output message="tns:DispatchShipmentOutput" /><fault name="FulfillmentFault" message="tns:FulfillmentFaultMessage" /></operation>
+    <operation name="TrackWorkflow"><input message="tns:TrackWorkflowInput" /><output message="tns:TrackWorkflowOutput" /></operation>
+  </portType>
+  <binding name="FulfillmentPlanningSoap11Binding" type="tns:FulfillmentPlanningPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="PlanShipment"><soap:operation soapAction="urn:fixtures:fulfillment-platform:PlanShipment" /><input><soap:body use="literal" /></input><output><soap:body use="literal" /></output><fault name="FulfillmentFault"><soap:fault name="FulfillmentFault" use="literal" /></fault></operation>
+    <operation name="RouteShipment"><soap:operation soapAction="urn:fixtures:fulfillment-platform:RouteShipment" /><input><soap:body use="literal" /></input><output><soap:body use="literal" /></output></operation>
+    <operation name="ReserveInventory"><soap:operation soapAction="urn:fixtures:fulfillment-platform:ReserveInventory" /><input><soap:body use="literal" /></input><output><soap:body use="literal" /></output><fault name="FulfillmentFault"><soap:fault name="FulfillmentFault" use="literal" /></fault></operation>
+  </binding>
+  <binding name="FulfillmentExecutionSoap11Binding" type="tns:FulfillmentExecutionPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="DispatchShipment"><soap:operation soapAction="urn:fixtures:fulfillment-platform:DispatchShipment" /><input><soap:body use="literal" /></input><output><soap:body use="literal" /></output><fault name="FulfillmentFault"><soap:fault name="FulfillmentFault" use="literal" /></fault></operation>
+    <operation name="TrackWorkflow"><soap:operation soapAction="urn:fixtures:fulfillment-platform:TrackWorkflow" /><input><soap:body use="literal" /></input><output><soap:body use="literal" /></output></operation>
+  </binding>
+  <service name="FulfillmentPlatformService">
+    <port name="PlanningPort" binding="tns:FulfillmentPlanningSoap11Binding"><soap:address location="http://example.com/fulfillment-platform/planning" /></port>
+    <port name="ExecutionPort" binding="tns:FulfillmentExecutionSoap11Binding"><soap:address location="http://example.com/fulfillment-platform/execution" /></port>
+  </service>
+</definitions>

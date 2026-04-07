@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="HeaderFaultRoutingService"
+    targetNamespace="urn:fixtures:header-fault-routing"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="urn:fixtures:header-fault-routing"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <xsd:schema targetNamespace="urn:fixtures:header-fault-routing" elementFormDefault="qualified">
+      <xsd:element name="SecurityHeader">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="clientId" type="xsd:string" />
+            <xsd:element name="apiKey" type="xsd:string" />
+            <xsd:element name="signature" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="SecurityHeaderFault">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="headerCode" type="xsd:string" />
+            <xsd:element name="headerMessage" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ProcessPaymentRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="invoiceId" type="xsd:string" />
+            <xsd:element name="amount" type="xsd:decimal" />
+            <xsd:element name="currency" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ProcessPaymentResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="receiptId" type="xsd:string" />
+            <xsd:element name="authorizedUtc" type="xsd:dateTime" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ValidationFault">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="fieldName" type="xsd:string" />
+            <xsd:element name="message" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="AuthorizationFault">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="reasonCode" type="xsd:string" />
+            <xsd:element name="message" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="GetPaymentStatusRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="receiptId" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="GetPaymentStatusResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="status" type="xsd:string" />
+            <xsd:element name="statusUtc" type="xsd:dateTime" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="SecurityHeaderMessage">
+    <part name="credentials" element="tns:SecurityHeader" />
+  </message>
+  <message name="SecurityHeaderFaultMessage">
+    <part name="headerFault" element="tns:SecurityHeaderFault" />
+  </message>
+  <message name="ProcessPaymentInput">
+    <part name="paymentRequest" element="tns:ProcessPaymentRequest" />
+    <part name="correlationId" type="xsd:string" />
+    <part name="tenantCode" type="xsd:string" />
+    <part name="locale" type="xsd:string" />
+    <part name="requestHash" type="xsd:string" />
+  </message>
+  <message name="ProcessPaymentOutput">
+    <part name="parameters" element="tns:ProcessPaymentResponse" />
+  </message>
+  <message name="GetPaymentStatusInput">
+    <part name="parameters" element="tns:GetPaymentStatusRequest" />
+  </message>
+  <message name="GetPaymentStatusOutput">
+    <part name="parameters" element="tns:GetPaymentStatusResponse" />
+  </message>
+  <message name="ValidationFaultMessage">
+    <part name="fault" element="tns:ValidationFault" />
+  </message>
+  <message name="AuthorizationFaultMessage">
+    <part name="fault" element="tns:AuthorizationFault" />
+  </message>
+  <portType name="HeaderFaultRoutingPortType">
+    <operation name="ProcessPayment">
+      <input message="tns:ProcessPaymentInput" />
+      <output message="tns:ProcessPaymentOutput" />
+      <fault name="ValidationFault" message="tns:ValidationFaultMessage" />
+      <fault name="AuthorizationFault" message="tns:AuthorizationFaultMessage" />
+    </operation>
+    <operation name="GetPaymentStatus">
+      <input message="tns:GetPaymentStatusInput" />
+      <output message="tns:GetPaymentStatusOutput" />
+      <fault name="AuthorizationFault" message="tns:AuthorizationFaultMessage" />
+    </operation>
+  </portType>
+  <binding name="HeaderFaultRoutingBinding" type="tns:HeaderFaultRoutingPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="ProcessPayment">
+      <soap:operation soapAction="urn:fixtures:header-fault-routing:ProcessPayment" />
+      <input>
+        <soap:body parts="paymentRequest" use="literal" />
+        <soap:header message="tns:SecurityHeaderMessage" part="credentials" use="literal">
+          <soap:headerfault message="tns:SecurityHeaderFaultMessage" part="headerFault" use="literal" />
+        </soap:header>
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="ValidationFault">
+        <soap:fault name="ValidationFault" use="literal" />
+      </fault>
+      <fault name="AuthorizationFault">
+        <soap:fault name="AuthorizationFault" use="literal" />
+      </fault>
+    </operation>
+    <operation name="GetPaymentStatus">
+      <soap:operation soapAction="urn:fixtures:header-fault-routing:GetPaymentStatus" />
+      <input>
+        <soap:body use="literal" />
+        <soap:header message="tns:SecurityHeaderMessage" part="credentials" use="literal">
+          <soap:headerfault message="tns:SecurityHeaderFaultMessage" part="headerFault" use="literal" />
+        </soap:header>
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="AuthorizationFault">
+        <soap:fault name="AuthorizationFault" use="literal" />
+      </fault>
+    </operation>
+  </binding>
+  <service name="HeaderFaultRoutingService">
+    <port name="HeaderFaultRoutingPort" binding="tns:HeaderFaultRoutingBinding">
+      <soap:address location="http://example.com/header-fault-routing" />
+    </port>
+  </service>
+</definitions>

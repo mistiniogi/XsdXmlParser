@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="FireAndForgetNotificationService"
+    targetNamespace="urn:fixtures:fire-and-forget-notification"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="urn:fixtures:fire-and-forget-notification"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <xsd:schema targetNamespace="urn:fixtures:fire-and-forget-notification" elementFormDefault="qualified">
+      <xsd:complexType name="NotificationEnvelopeType">
+        <xsd:sequence>
+          <xsd:element name="notificationId" type="xsd:string" />
+          <xsd:element name="topic" type="xsd:string" />
+          <xsd:element name="occurredUtc" type="xsd:dateTime" />
+          <xsd:element name="payload" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="PublishInventoryDeltaRequest" type="tns:NotificationEnvelopeType" />
+      <xsd:element name="PurgeEndpointCacheRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="endpointCode" type="xsd:string" />
+            <xsd:element name="requestedBy" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="PublishInventoryDeltaInput">
+    <part name="parameters" element="tns:PublishInventoryDeltaRequest" />
+  </message>
+  <message name="PurgeEndpointCacheInput">
+    <part name="parameters" element="tns:PurgeEndpointCacheRequest" />
+  </message>
+  <portType name="FireAndForgetNotificationPortType">
+    <operation name="PublishInventoryDelta">
+      <input message="tns:PublishInventoryDeltaInput" />
+    </operation>
+    <operation name="PurgeEndpointCache">
+      <input message="tns:PurgeEndpointCacheInput" />
+    </operation>
+  </portType>
+  <binding name="FireAndForgetNotificationBinding" type="tns:FireAndForgetNotificationPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="PublishInventoryDelta">
+      <soap:operation soapAction="urn:fixtures:fire-and-forget-notification:PublishInventoryDelta" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+    </operation>
+    <operation name="PurgeEndpointCache">
+      <soap:operation soapAction="urn:fixtures:fire-and-forget-notification:PurgeEndpointCache" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+    </operation>
+  </binding>
+  <service name="FireAndForgetNotificationService">
+    <port name="FireAndForgetNotificationPort" binding="tns:FireAndForgetNotificationBinding">
+      <soap:address location="http://example.com/fire-and-forget-notification" />
+    </port>
+  </service>
+</definitions>

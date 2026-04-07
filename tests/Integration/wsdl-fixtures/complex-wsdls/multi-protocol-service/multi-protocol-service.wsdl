@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="MultiProtocolService"
+    targetNamespace="urn:fixtures:multi-protocol-service"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+    xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="urn:fixtures:multi-protocol-service"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <xsd:schema targetNamespace="urn:fixtures:multi-protocol-service" elementFormDefault="qualified">
+      <xsd:element name="SearchCatalogResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="resultCount" type="xsd:int" />
+            <xsd:element name="item" minOccurs="0" maxOccurs="unbounded">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element name="sku" type="xsd:string" />
+                  <xsd:element name="title" type="xsd:string" />
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="LookupStatusResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="serviceState" type="xsd:string" />
+            <xsd:element name="updatedUtc" type="xsd:dateTime" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="SearchCatalogInput">
+    <part name="query" type="xsd:string" />
+    <part name="market" type="xsd:string" />
+    <part name="includeInactive" type="xsd:boolean" />
+  </message>
+  <message name="SearchCatalogOutput">
+    <part name="catalog" element="tns:SearchCatalogResponse" />
+  </message>
+  <message name="LookupStatusInput">
+    <part name="environment" type="xsd:string" />
+  </message>
+  <message name="LookupStatusOutput">
+    <part name="status" element="tns:LookupStatusResponse" />
+  </message>
+  <portType name="MultiProtocolPortType">
+    <operation name="SearchCatalog">
+      <input message="tns:SearchCatalogInput" />
+      <output message="tns:SearchCatalogOutput" />
+    </operation>
+    <operation name="LookupStatus">
+      <input message="tns:LookupStatusInput" />
+      <output message="tns:LookupStatusOutput" />
+    </operation>
+  </portType>
+  <binding name="CatalogSoap11Binding" type="tns:MultiProtocolPortType">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="SearchCatalog">
+      <soap:operation soapAction="urn:fixtures:multi-protocol-service:SearchCatalog" />
+      <input><soap:body use="literal" namespace="urn:fixtures:multi-protocol-service" /></input>
+      <output><soap:body use="literal" namespace="urn:fixtures:multi-protocol-service" /></output>
+    </operation>
+    <operation name="LookupStatus">
+      <soap:operation soapAction="urn:fixtures:multi-protocol-service:LookupStatus" />
+      <input><soap:body use="literal" namespace="urn:fixtures:multi-protocol-service" /></input>
+      <output><soap:body use="literal" namespace="urn:fixtures:multi-protocol-service" /></output>
+    </operation>
+  </binding>
+  <binding name="CatalogHttpGetBinding" type="tns:MultiProtocolPortType">
+    <http:binding verb="GET" />
+    <operation name="SearchCatalog">
+      <http:operation location="/catalog/search" />
+      <input><http:urlEncoded /></input>
+      <output><mime:mimeXml part="catalog" /></output>
+    </operation>
+    <operation name="LookupStatus">
+      <http:operation location="/catalog/status" />
+      <input><http:urlEncoded /></input>
+      <output><mime:mimeXml part="status" /></output>
+    </operation>
+  </binding>
+  <service name="MultiProtocolService">
+    <port name="CatalogSoap11Port" binding="tns:CatalogSoap11Binding">
+      <soap:address location="http://example.com/multi-protocol-service/soap11" />
+    </port>
+    <port name="CatalogHttpGetPort" binding="tns:CatalogHttpGetBinding">
+      <http:address location="http://example.com/multi-protocol-service/http" />
+    </port>
+  </service>
+</definitions>

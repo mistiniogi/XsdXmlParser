@@ -1,0 +1,36 @@
+<definitions name="StockService"
+    targetNamespace="http://example.com/stock"
+    xmlns:tns="http://example.com/stock"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+    <message name="GetPriceRequest">
+        <part name="symbol" type="xsd:string"/>
+    </message>
+    <message name="GetPriceResponse">
+        <part name="price" type="xsd:float"/>
+    </message>
+
+    <portType name="StockPortType">
+        <operation name="GetStockPrice">
+            <input message="tns:GetPriceRequest"/>
+            <output message="tns:GetPriceResponse"/>
+        </operation>
+    </portType>
+
+    <binding name="StockBinding" type="tns:StockPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="GetStockPrice">
+            <soap:operation soapAction="getCurrentPrice"/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+    </binding>
+
+    <service name="StockService">
+        <port name="StockPort" binding="tns:StockBinding">
+            <soap:address location="http://example.com/stockquote"/>
+        </port>
+    </service>
+</definitions>

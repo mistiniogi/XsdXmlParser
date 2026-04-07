@@ -29,7 +29,7 @@ Enhance XML documentation comments across all declarations in production C# sour
 - Registry design uses a centralized, ID-based source of truth for shared type definitions.
 - Naming contracts for enums, models, interfaces, and implementations are explicitly satisfied or justified.
 - Target framework support and C# 10.0-only language-version constraints comply with the active constitution.
-- DI registration, lifetime ownership, and testing seams are documented.
+- DI registration, lifetime ownership, and integration verification boundaries are documented.
 - Full C# XML documentation expectations for types and members, and rationale-comment hotspots for complex logic, are documented.
 
 Result: PASS. This feature does not modify async boundaries, registry behavior, naming contracts, target framework support, or DI structure; it strengthens the documentation artifacts that describe those existing constraints. Validation remains source-first so the broader all-visibility scope does not conflict with compiler-generated XML documentation limits.
@@ -59,12 +59,10 @@ src/
 └── Serialization/
 
 tests/
-├── Contract/
-├── Integration/
-└── Unit/
+└── Integration/
 ```
 
-**Structure Decision**: Use the existing single-library repository structure rooted at `src/` and `tests/`. The implementation scope is limited to XML documentation comments in `src/`; the files in `specs/005-enhance-xml-docs/` are planning artifacts that guide execution but are not part of the source-edit deliverable. Runtime code, tests, and markdown documentation remain unchanged.
+**Structure Decision**: Use the existing single-library repository structure rooted at `src/` and `tests/Integration`. The implementation scope is limited to XML documentation comments in `src/`; the files in `specs/005-enhance-xml-docs/` are planning artifacts that guide execution but are not part of the source-edit deliverable. Runtime code, integration assets, and markdown documentation remain unchanged.
 
 ## Complexity Tracking
 

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions
+    name="ImportChainAbstractContract"
+    targetNamespace="urn:fixtures:import-chain-network:abstract"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:main="urn:fixtures:import-chain-network:schemas:main"
+    xmlns:partner="urn:fixtures:import-chain-network:schemas:partner"
+    xmlns:tns="urn:fixtures:import-chain-network:abstract"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <xsd:schema targetNamespace="urn:fixtures:import-chain-network:schemas:main" elementFormDefault="qualified">
+      <xsd:include schemaLocation="common-elements.xsd" />
+      <xsd:import namespace="urn:fixtures:import-chain-network:schemas:partner" schemaLocation="partner-domain.xsd" />
+      <xsd:element name="ResolveCustomerRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="header" type="main:CommonRequestHeaderType" />
+            <xsd:element name="partnerProfile" type="partner:PartnerProfileType" />
+            <xsd:element name="customerNumber" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ResolveCustomerResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="context" type="main:CommonResponseContextType" />
+            <xsd:element name="resolvedCustomerId" type="xsd:string" />
+            <xsd:element name="confidence" type="xsd:decimal" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="ResolveCustomerInput">
+    <part name="parameters" element="main:ResolveCustomerRequest" />
+  </message>
+  <message name="ResolveCustomerOutput">
+    <part name="parameters" element="main:ResolveCustomerResponse" />
+  </message>
+  <portType name="CustomerContractPortType">
+    <operation name="ResolveCustomer">
+      <input message="tns:ResolveCustomerInput" />
+      <output message="tns:ResolveCustomerOutput" />
+    </operation>
+  </portType>
+</definitions>
