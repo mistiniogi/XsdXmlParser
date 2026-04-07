@@ -3,7 +3,7 @@
 **Input**: Design documents from `/specs/001-wsdl-xml-parser/`
 **Prerequisites**: plan.md, spec.md, data-model.md, contracts/, quickstart.md
 
-**Tests**: Tests are integrated per user story (xUnit with Moq and integration tests).
+**Tests**: Tests are integrated per user story through `tests/Integration` scenarios.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation, validation, and parallel work.
 
@@ -16,20 +16,20 @@
 ## Path Conventions
 
 - Source: `src/`
-- Tests: `tests/`
+- Tests: `tests/Integration/`
 - Follow plan.md project structure with Models/, Services/, Parsers/, Validators/, Generators/, Extensions/
 
 ---
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-**Purpose**: Initialize project structure, DI, testing, and static analysis support.
+**Purpose**: Initialize project structure, DI, integration validation, and static analysis support.
 
 - [ ] T001 Configure `XsdXmlParser.csproj` for multi-targeting net6.0;net7.0;net8.0, package identity `XsdXmlParser.Core`, and C# 10.0 compatibility
 - [ ] T002 Create `src/` folders: Models/, Services/Abstractions/, Services/Implementations/, Parsers/, Validators/, Generators/, Extensions/
-- [ ] T003 Create `tests/` folders: Unit/Parsers/, Unit/Services/, Unit/Validators/, Unit/Generators/, Integration/
+- [ ] T003 Create `tests/Integration/` folders for parser, generator, DI, and end-to-end scenarios
 - [ ] T004 Add `.editorconfig` at repository root with StyleCop, FxCop, SonarAnalyzer, and AsyncFixer rules
-- [ ] T005 Add unit test project references for xUnit and Moq
+- [ ] T005 Add integration test project references for xUnit
 - [ ] T006 Add GitHub workflow skeleton for build, test, and analyzer validation
 - [ ] T007 Add documentation placeholders for `README.md`, `ARCHITECTURE.md`, and `API.md`
 
@@ -54,7 +54,7 @@
 - [ ] T018 [P] Create exception types in `src/Exceptions/`: `InvalidWsdlException.cs`, `InvalidXsdException.cs`, `InvalidDataException.cs`
 - [ ] T019 [P] Create `src/Extensions/ServiceCollectionExtensions.cs` with public `AddXsdXmlParser()` extension method
 - [ ] T020 [P] Create `src/Parsers/BaseElementParser.cs` with abstract parse/validation contract and stateless helper methods
-- [ ] T021 [P] Create unit test scaffolding for all service interfaces in `tests/Unit/Services/`
+- [ ] T021 [P] Create integration test scaffolding for parser and generator workflows in `tests/Integration/ServiceWorkflows/`
 - [ ] T022 [P] Define async-first service contracts in `src/Services/Abstractions/` with `ParseAsync`/`GenerateAsync` methods and `CancellationToken` support
 - [ ] T023 [P] Create a benchmark harness and representative 10,000-element schema fixture in `tests/Performance/` for early parser validation across net6.0, net7.0, and net8.0
 - [ ] T024 [P] Create async cancellation and concurrent parsing test scaffolding in `tests/Integration/AsyncExecutionTests.cs`
@@ -78,10 +78,10 @@
 - [ ] T031 [US1] Implement embedded XSD schema extraction in `WSDLParserService` and delegate to `IXSDParser`
 - [ ] T032 [P] [US1] Implement WSDL namespace resolution and prefix handling
 - [ ] T033 [US1] Implement strict error handling with `InvalidWsdlException` and line/column context
-- [ ] T034 [US1] Create unit tests in `tests/Unit/Services/WSDLParserServiceTests.cs`
+- [ ] T034 [US1] Create integration coverage in `tests/Integration/WsdlParserIntegrationTests.cs`
 - [ ] T035 [P] [US1] Create per-element WSDL parser classes in `src/Parsers/ElementParsers/` for service, binding, portType, and message
 
-**Checkpoint**: US1 can be validated independently with unit tests.
+**Checkpoint**: US1 can be validated independently with integration tests.
 
 ---
 
@@ -107,10 +107,10 @@
 - [ ] T049 [US2] Implement recursive type detection and safe graph traversal state tracking
 - [ ] T050 [US2] Implement strict error handling with `InvalidXsdException`
 - [ ] T051 [US2] Create one independent `ElementParser` class per named XSD element in `src/Parsers/ElementParsers/`
-- [ ] T052 [US2] Create unit tests in `tests/Unit/Services/XSDParserServiceTests.cs`
+- [ ] T052 [US2] Create integration coverage in `tests/Integration/XsdParserIntegrationTests.cs`
 - [ ] T053 [P] [US2] Create facet validator classes in `src/Validators/` for length, pattern, enumeration, and range constraints
 
-**Checkpoint**: US2 can be validated independently with unit tests.
+**Checkpoint**: US2 can be validated independently with integration tests.
 
 ---
 
@@ -129,9 +129,9 @@
 - [ ] T060 [US3] Serialize documentation metadata with schema annotations
 - [ ] T061 [P] [US3] Apply camelCase property naming in JSON output
 - [ ] T062 [US3] Include namespace mappings and registry IDs in JSON metadata output
-- [ ] T063 [US3] Create unit tests in `tests/Unit/Services/JSONMetadataGeneratorServiceTests.cs`
+- [ ] T063 [US3] Create integration coverage in `tests/Integration/JsonMetadataIntegrationTests.cs`
 
-**Checkpoint**: US3 can be validated independently with unit tests.
+**Checkpoint**: US3 can be validated independently with integration tests.
 
 ---
 
@@ -150,9 +150,9 @@
 - [ ] T070 [US4] Implement recursive complex type element generation
 - [ ] T071 [US4] Implement attribute generation from data objects
 - [ ] T072 [US4] Implement XML instance validation against `SchemaModel`
-- [ ] T073 [US4] Create unit tests in `tests/Unit/Services/XMLGeneratorServiceTests.cs`
+- [ ] T073 [US4] Create integration coverage in `tests/Integration/XmlGenerationIntegrationTests.cs`
 
-**Checkpoint**: US4 can be validated independently with unit tests.
+**Checkpoint**: US4 can be validated independently with integration tests.
 
 ---
 

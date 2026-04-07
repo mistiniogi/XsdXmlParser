@@ -1,5 +1,5 @@
 # XsdXmlParser Development Guidelines
-Auto-generated from all feature plans. Last updated: 2026-04-06
+Auto-generated from all feature plans. Last updated: 2026-04-07
 
 ## ⚠️ Design Preservation Rules (Apply to ALL New Features)
 
@@ -36,6 +36,9 @@ by the feature, make the smallest possible change that satisfies the requirement
 - C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file (005-enhance-xml-docs)
 - C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` for the host repository; WSDL 1.1 and XSD fixture files only for this feature + Existing library dependencies remain unchanged: `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file (006-wsdl-test-assets)
 - Filesystem-backed test fixture assets under `tests/Integration/wsdl-fixtures` (006-wsdl-test-assets)
+- C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` + Existing library package graph plus `Microsoft.NET.Test.Sdk`, `xunit`, and `xunit.runner.visualstudio` in a dedicated integration test project; DI usage continues through `Microsoft.Extensions.DependencyInjection` and repository parser abstractions (007-wsdl-integration-tests)
+- Filesystem-backed WSDL/XSD fixtures under `tests/Integration/wsdl-fixtures` and source-controlled integration test code under `tests/Integration` (007-wsdl-integration-tests)
+- C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` + Existing library package graph plus `Microsoft.NET.Test.Sdk`, `xunit`, and `xunit.runner.visualstudio` in a dedicated integration test project; DI usage continues through `Microsoft.Extensions.DependencyInjection` and repository parser abstractions such as `IParserOrchestrationService` and `IWsdlParser` (007-wsdl-integration-tests)
 
 ## Project Structure
 ```text
@@ -64,9 +67,9 @@ Before generating any new file or modifying an existing one for a speckit featur
 - [ ] No hardcoded strings — use constants or resource identifiers consistent with existing patterns
 
 ## Recent Changes
+- 007-wsdl-integration-tests: Added C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` + Existing library package graph plus `Microsoft.NET.Test.Sdk`, `xunit`, and `xunit.runner.visualstudio` in a dedicated integration test project; DI usage continues through `Microsoft.Extensions.DependencyInjection` and repository parser abstractions such as `IParserOrchestrationService` and `IWsdlParser`
+- 007-wsdl-integration-tests: Added C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` + Existing library package graph plus `Microsoft.NET.Test.Sdk`, `xunit`, and `xunit.runner.visualstudio` in a dedicated integration test project; DI usage continues through `Microsoft.Extensions.DependencyInjection` and repository parser abstractions
 - 006-wsdl-test-assets: Added C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` for the host repository; WSDL 1.1 and XSD fixture files only for this feature + Existing library dependencies remain unchanged: `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file
-- 005-enhance-xml-docs: Added C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file
-- 005-enhance-xml-docs: Added C# 10.0 on .NET `net6.0`, `net7.0`, and `net8.0` + `System.Xml`, `System.Text.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Logging.Abstractions`, analyzer packages configured in the project file
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

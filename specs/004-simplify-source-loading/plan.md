@@ -84,12 +84,10 @@ docs/
 └── toc.yml
 
 tests/
-├── Contract/
-├── Integration/
-└── Unit/
+└── Integration/
 ```
 
-**Structure Decision**: Continue using the existing single-library structure. Feature work is concentrated in `src/Abstractions`, `src/Models`, and `src/Parsing`, with supporting DI and consumer documentation updates in `src/Extensions`, `README.md`, and `docs/getting-started.md`. The repository `tests/` tree remains part of the project context for future validation, but this plan does not add new test logic.
+**Structure Decision**: Continue using the existing single-library structure. Feature work is concentrated in `src/Abstractions`, `src/Models`, and `src/Parsing`, with supporting DI and consumer documentation updates in `src/Extensions`, `README.md`, and `docs/getting-started.md`. The repository `tests/Integration` tree remains part of the project context for future validation, but this plan does not add new test logic.
 
 ## Implementation Phases
 

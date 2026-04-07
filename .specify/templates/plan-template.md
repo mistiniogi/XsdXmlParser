@@ -20,7 +20,7 @@
 **Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
 **Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
 **Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Testing**: [e.g., integration tests in tests/Integration only, or NEEDS CLARIFICATION]  
 **Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
 **Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]  
 **Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
@@ -35,7 +35,8 @@
 - Registry design uses a centralized, ID-based source of truth for shared type definitions.
 - Naming contracts for enums, models, interfaces, and implementations are explicitly satisfied or justified.
 - Target framework support and C# 10.0-only language-version constraints comply with the active constitution.
-- DI registration, lifetime ownership, and testing seams are documented.
+- DI registration, lifetime ownership, and integration verification boundaries are documented.
+- Automated verification, if requested, is planned under `tests/Integration` only with no unit-test or contract-test suites.
 - Full C# XML documentation expectations for types and members, and rationale-comment hotspots for complex logic, are documented.
 
 ## Project Structure
@@ -69,9 +70,7 @@ src/
 └── lib/
 
 tests/
-├── contract/
-├── integration/
-└── unit/
+└── Integration/
 
 # [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
 backend/

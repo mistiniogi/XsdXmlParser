@@ -11,6 +11,8 @@
   IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
   Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
   you should still have a viable MVP (Minimum Viable Product) that delivers value.
+  In this repository, independent automated verification is expressed as an integration scenario under tests/Integration,
+  not as unit-test or contract-test suites.
   
   Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
   Think of each story as a standalone slice of functionality that can be:
@@ -26,7 +28,7 @@
 
 **Why this priority**: [Explain the value and why it has this priority level]
 
-**Independent Test**: [Describe how this can be tested independently - e.g., "Can be fully tested by [specific action] and delivers [specific value]"]
+**Independent Test**: [Describe the integration scenario that proves this story independently - e.g., "Can be fully tested by [specific action] in tests/Integration and delivers [specific value]"]
 
 **Acceptance Scenarios**:
 
@@ -91,6 +93,7 @@
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
 - **FR-00X**: C# types and members introduced or changed by the feature MUST define XML documentation requirements where they affect the shared production surface.
 - **FR-00Y**: Complex logic paths MUST identify hotspots that require inline `Why` comments when implementation work begins.
+- **FR-00Z**: If automated verification is requested, it MUST be specified as integration coverage that lives under `tests/Integration`.
 
 *Example of marking unclear requirements:*
 

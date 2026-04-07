@@ -77,20 +77,14 @@ src/
 └── Serialization/
 
 tests/
-├── Contract/
-│   └── MetadataGraph/
-├── Integration/
+└── Integration/
 │   ├── Cycles/
 │   ├── MultiSource/
-│   └── SingleSource/
-└── Unit/
-    ├── Parsing/
-    ├── RefIds/
-    ├── Registry/
-    └── Serialization/
+│   ├── SingleSource/
+│   └── MetadataGraph/
 ```
 
-**Structure Decision**: Continue using the single multi-target library layout already established in `src/`, with orchestration, source loading, discovery, graph building, registry services, and serialization staying in their current feature-aligned folders. Existing `tests/` directories remain part of the repository structure for future validation work, but this feature plan does not include creating new test logic.
+**Structure Decision**: Continue using the single multi-target library layout already established in `src/`, with orchestration, source loading, discovery, graph building, registry services, and serialization staying in their current feature-aligned folders. Existing integration-test directories remain part of the repository structure for future validation work, but this feature plan does not include creating new test logic.
 
 ## Implementation Phases
 
@@ -119,7 +113,7 @@ tests/
 - Recheck multi-target compatibility, XML documentation coverage, and `Why` comment hotspots after implementation.
 - Reconcile README and docs updates with the final public contract shape.
 - Validate async/cancellation behavior, exception-based failure semantics, and documentation walkthrough completion against the success criteria without adding new test logic.
-- Preserve repository testing seams without expanding the feature scope into new test logic.
+- Preserve repository integration-verification boundaries without expanding the feature scope into new test logic.
 
 ## Risks and Mitigations
 
@@ -138,7 +132,7 @@ tests/
 - Centralized registry ownership is preserved; no design artifact introduces duplicate schema-definition storage.
 - New planned types follow the `I*`, `*Model`, and `E*` naming rules with no exceptions.
 - The design remains within `net6.0`, `net7.0`, `net8.0`, and C# 10.0 compatibility boundaries.
-- DI ownership is explicit through one primary orchestration service plus internal collaborators; testing seams remain documented even though new test logic is out of scope.
+- DI ownership is explicit through one primary orchestration service plus internal collaborators; integration verification boundaries remain documented even though new test logic is out of scope.
 - XML documentation and `Why` comment hotspots are explicitly identified for orchestration, handler dispatch, registry canonicalization, and exception translation.
 
 ## Complexity Tracking

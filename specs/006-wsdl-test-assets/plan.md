@@ -29,7 +29,7 @@ Add a reusable WSDL fixture catalog under `tests/Integration/wsdl-fixtures` for 
 - Registry design uses a centralized, ID-based source of truth for shared type definitions.
 - Naming contracts for enums, models, interfaces, and implementations are explicitly satisfied or justified.
 - Target framework support and C# 10.0-only language-version constraints comply with the active constitution.
-- DI registration, lifetime ownership, and testing seams are documented.
+- DI registration, lifetime ownership, and integration verification boundaries are documented.
 - Full C# XML documentation expectations for types and members, and rationale-comment hotspots for complex logic, are documented.
 
 Result: PASS. This feature adds only test assets under `tests/Integration/wsdl-fixtures` and does not modify async APIs, registry behavior, naming contracts for production code, target framework support, DI registration, or C# XML documentation surfaces. The plan keeps implementation scope explicitly asset-only so it remains compatible with the constitution and the spec's no-code-change boundary.
@@ -60,8 +60,7 @@ src/
 └── Serialization/
 
 tests/
-├── Contract/
-├── Integration/
+└── Integration/
 │   ├── Cycles/
 │   ├── MultiSource/
 │   ├── SingleSource/
@@ -72,10 +71,9 @@ tests/
 │       ├── very-complex-wsdls/
 │       ├── very-complex-wsdls-with-xsd-imports/
 │       └── invalid-wsdls/
-└── Unit/
 ```
 
-**Structure Decision**: Use the existing single-library repository layout rooted at `src/` and `tests/`, and place the new assets inside `tests/Integration/wsdl-fixtures` because the repository already groups integration scenarios by dedicated directories. Each category folder will contain one or more self-contained fixture-set subfolders so future tests can reference stable paths without mixing files from unrelated scenarios.
+**Structure Decision**: Use the existing single-library repository layout rooted at `src/` and `tests/Integration`, and place the new assets inside `tests/Integration/wsdl-fixtures` because the repository already groups integration scenarios by dedicated directories. Each category folder will contain one or more self-contained fixture-set subfolders so future tests can reference stable paths without mixing files from unrelated scenarios.
 
 ## Complexity Tracking
 
